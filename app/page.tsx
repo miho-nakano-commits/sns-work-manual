@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Screen = {
   type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "checklist" | "form" | "multiChecklist";
@@ -211,7 +211,7 @@ export default function Home() {
           {screen.hint && <div className="hint-wrap"><button className="hint-button" onClick={() => setHintOpen(!hintOpen)} aria-expanded={hintOpen}>💡 ヒントを見る</button>{hintOpen && <div className="hint-box">{screen.hint}</div>}</div>}
           <div className="lesson-actions">
             <button className="secondary-button" onClick={back}>← 戻る</button>
-            <button className="primary-button" onClick={next} disabled={!allChecked}>{page === step.screens.length - 1 ? `STEP${stepId} 完了` : "できた・次へ →"}</button>
+            <button className="primary-button" onClick={next} disabled={!allChecked}>{page === step.screens.length - 1 ? `STEP${stepId} 完了` : "次へ →"}</button>
           </div>
           {!allChecked && <p className="disabled-note">すべてにチェックすると完了できます</p>}
         </section>
