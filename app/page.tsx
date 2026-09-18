@@ -335,7 +335,16 @@ function ScreenContent({ screen, step, saved, screenKey, updateCheck, updateForm
 }
 
 function Lead({ text }: { text?: string }) { return text ? <p className="lesson-lead">{text}</p> : null; }
-function Flow({ steps }: { steps: string[] }) { return <div className="flow">{steps.map((s,i) => <div key={s}><span>{String(i+1).padStart(2,"0")}</span><strong>{s}</strong>{i < steps.length-1 && <b>↓</b>}</div>)}</div> }
+function Flow({ steps }: { steps: string[] }) {
+  const [openItems, setOpenItems] = useState<number[]>([]);
+  const toggle = (index: number) => setOpenItems(items => items.includes(index) ? items.filter(item => item !== index) : [...items, index]);
+  return <div className="flow">{steps.map((text, i) => {
+    const [summary, details] = text.split("\n\n", 2);
+    const isOpen = openItems.includes(i);
+    const detailsId = `flow-details-${i}`;
+    return <div key={text}><span>{String(i+1).padStart(2,"0")}</span>{details ? <div className={`flow-accordion ${isOpen ? "open" : ""}`}><button type="button" onClick={() => toggle(i)} aria-expanded={isOpen} aria-controls={detailsId}><strong>{summary}</strong><em aria-hidden="true">⌄</em></button>{isOpen && <div className="flow-details" id={detailsId}>{details}</div>}</div> : <strong>{text}</strong>}{i < steps.length-1 && <b>↓</b>}</div>;
+  })}</div>
+}
 function CardList({ items, type }: { items: string[]; type: string }) { return <div className={`info-grid ${type}`}>{items.map((x,i)=><div key={x}><span>{type === "mistakes" ? "!" : type === "points" ? "✓" : String(i+1).padStart(2,"0")}</span><p>{x}</p></div>)}</div> }
 function Compare({ ok, ng }: { ok:string[]; ng:string[] }) { return <div className="compare"><section className="ok"><h3><span>OK</span> この場合は対象</h3>{ok.map(x=><p key={x}>✓　{x}</p>)}</section><section className="ng"><h3><span>NG</span> この場合は対象外</h3>{ng.map(x=><p key={x}>×　{x}</p>)}</section></div> }
 function Decision({ steps, hint }: { steps:string[]; hint:string }) { return <><div className="decision">{steps.map((s,i)=><div className="decision-row" key={s}><div className="question"><small>確認 {i+1}</small><strong>{s}</strong></div><div className="answer yes"><b>YES</b><span>{i === steps.length-1 ? "記入・次の作業へ" : "次の確認へ ↓"}</span></div><div className="answer no"><b>NO</b><span>対象外・見直す</span></div></div>)}</div><div className="decision-result">判断のしかた：{hint}</div></> }
