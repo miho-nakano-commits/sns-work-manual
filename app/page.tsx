@@ -50,16 +50,14 @@ const STEPS: StepData[] = [
     screens: [
       { type: "intro", title: "今回やること", lead: "どんな動画が多くの人に見られているのかを調べます。", hint: "再生数と動画の中身を、セットで記録します。" },
       { type: "why", title: "なぜ、この作業をするの？", steps: ["再生数が多い", "たくさんの人に見られている", "見てもらいやすい理由がある", "共通点を探す", "今後の動画作りに活かす"] },
-      { type: "goal", title: "完成イメージ", lead: "指定された件数のリールと、『伸びたと思う理由』が表に整理された状態です。", items: ["投稿URL", "アカウント名", "再生回数", "動画の内容", "冒頭・長さ・テロップ", "BGMと参考ポイント"] },
-      LIST("prepare", "始める前の準備", ["Instagram", "指定されたジャンル", "記入用スプレッドシート", "音を出せる環境またはイヤホン"]),
-      PROCESS("作業の流れ", ["指定ジャンルを見る", "リールを見る", "再生数を確認", "伸びている動画を選ぶ", "特徴を見る", "スプレッドシートへ入力"]),
-      LIST("points", "動画を見る8つのポイント", ["最初に何を見せている？", "最初にどんな文字が出る？", "続きが気になる始まり方？", "人物は映っている？", "テンポは速い？遅い？", "テロップの使い方は？", "動画の長さは？", "一番印象に残るのは？"]),
-      { type: "example", title: "考えてみよう", lead: "『最初の2秒で完成品を見せているので、続きが気になる』のように、見た事実と理由を短く書きます。", image: "リール再生数の確認画面" },
-      { type: "compare", title: "OK例とNG例", ok: ["再生数を正しく記録", "冒頭やテンポも観察", "理由を自分の言葉で書く"], ng: ["なんとなく選ぶ", "再生数だけを記録", "『すごい』だけで終わる"] },
-      LIST("mistakes", "よくある失敗", ["再生数といいね数を間違える", "動画を最後まで見ずに決める", "URLを別の投稿からコピーする", "参考ポイントが空欄になる"]),
-      { type: "decision", title: "この動画は記録する？", steps: ["指定ジャンル？", "基準より再生数が多い？", "伸びた理由を1つ言える？"], hint: "3つともYES → 記入。NOがある → 別のリールを見る。" },
+      { type: "goal", title: "完成イメージ", lead: "指定された件数のリールと、『伸びたと思う理由』が表に整理された状態です。", items: ["投稿URL", "再生回数", "フォロワー数", "リール動画の内容", "参考ポイント"] },
+      LIST("prepare", "始める前の準備", ["Instagramを開く", "スプレッドシートの「リール分析」タブを開く", "下記のジャンルから選んで検索\n\n・営業ノウハウ・営業トーク・営業術・営業テクニック・営業マンの日常\n・営業あるある・商談テクニック・新規営業・法人営業\n・社員の日常・会社の日常・社会人の日常・社会人vlog・仕事vlog・社員vlog\n・1日密着・リモートワーク・リモートワーカー・リモートワークの日常\n・在宅ワークvlog・フルリモート・フルリモートの日常\n・仕事術・仕事効率化・ビジネススキル・仕事で使える知識\n\n「営業マン 1日密着」\n「営業 社会人vlog」\n「フルリモート 社員の日常」\n「仕事術 リール」\n「営業あるある」など組み合わせてもOK", "音を出せる環境またはイヤホン"]),
+      PROCESS("作業の流れ", ["検索ワードで検索", "10万回再生以上のリールを探す", "伸びている動画を選ぶ", "特徴を見る", "スプレッドシートへ入力"]),
+      { type: "compare", title: "OK例とNG例", ok: ["10万回以上再生されている", "検索キーワードと関係がある内容", "参考になりそう！"], ng: ["なんとなく選ぶ", "10万回再生を下回っている"] },
+      LIST("mistakes", "よくある失敗", ["再生数といいね数を間違える", "動画を最後まで見ずに決める", "URLを別の投稿からコピーする", "検索キーワードとは全く違う内容"]),
+      { type: "decision", title: "この動画は記録する？", steps: ["検索キーワードと関連性ある？", "10万回再生より多い？", "リールがどんな内容か書き出せそう？"], hint: "3つともYES → 記入。NOがある → 別のリールを見る。" },
       { type: "video", title: "実際の操作方法を動画で見る", lead: "再生数の見方や投稿URLのコピー方法を確認できます。", image: "STEP2 リール確認画面" },
-      LIST("checklist", "作業完了チェック", ["指定件数を記入した", "投稿URLに間違いがない", "再生回数を記入した", "8つのポイントを確認した", "伸びた理由を自分の言葉で書いた"])
+      LIST("checklist", "作業完了チェック", ["指定件数を記入した", "投稿URLに間違いがない", "すべて10万回以上再生されている", "検索キーワードと関係がある", "リール動画の内容を記入した", "参考ポイントを記入した"])
     ]
   },
   {
@@ -340,13 +338,26 @@ function Flow({ steps }: { steps: string[] }) {
   const [openItems, setOpenItems] = useState<number[]>([]);
   const toggle = (index: number) => setOpenItems(items => items.includes(index) ? items.filter(item => item !== index) : [...items, index]);
   return <div className="flow">{steps.map((text, i) => {
-    const [summary, details] = text.split("\n\n", 2);
+    const [summary, details] = splitDetails(text);
     const isOpen = openItems.includes(i);
     const detailsId = `flow-details-${i}`;
     return <div key={text}><span>{String(i+1).padStart(2,"0")}</span>{details ? <div className={`flow-accordion ${isOpen ? "open" : ""}`}><button type="button" onClick={() => toggle(i)} aria-expanded={isOpen} aria-controls={detailsId}><strong>{summary}</strong><em aria-hidden="true">⌄</em></button>{isOpen && <div className="flow-details" id={detailsId}>{details}</div>}</div> : <strong>{text}</strong>}{i < steps.length-1 && <b>↓</b>}</div>;
   })}</div>
 }
-function CardList({ items, type }: { items: string[]; type: string }) { return <div className={`info-grid ${type}`}>{items.map((x,i)=><div key={x}><span>{type === "mistakes" ? "!" : type === "points" ? "✓" : String(i+1).padStart(2,"0")}</span><p>{x}</p></div>)}</div> }
+function splitDetails(text: string): [string, string] {
+  const divider = text.indexOf("\n\n");
+  return divider === -1 ? [text, ""] : [text.slice(0, divider), text.slice(divider + 2)];
+}
+function CardList({ items, type }: { items: string[]; type: string }) {
+  const [openItems, setOpenItems] = useState<number[]>([]);
+  const toggle = (index: number) => setOpenItems(current => current.includes(index) ? current.filter(item => item !== index) : [...current, index]);
+  return <div className={`info-grid ${type}`}>{items.map((text, i) => {
+    const [summary, details] = splitDetails(text);
+    const isOpen = openItems.includes(i);
+    const detailsId = `info-details-${type}-${i}`;
+    return <div key={text} className={details ? "has-details" : undefined}><span>{type === "mistakes" ? "!" : type === "points" ? "✓" : String(i+1).padStart(2,"0")}</span>{details ? <div className={`info-accordion ${isOpen ? "open" : ""}`}><button type="button" onClick={() => toggle(i)} aria-expanded={isOpen} aria-controls={detailsId}><p>{summary}</p><em aria-hidden="true">⌄</em></button>{isOpen && <div className="info-details" id={detailsId}>{details}</div>}</div> : <p>{text}</p>}</div>;
+  })}</div>;
+}
 function Compare({ ok, ng }: { ok:string[]; ng:string[] }) { return <div className="compare"><section className="ok"><h3><span>OK</span> この場合は対象</h3>{ok.map(x=><p key={x}>✓　{x}</p>)}</section><section className="ng"><h3><span>NG</span> この場合は対象外</h3>{ng.map(x=><p key={x}>×　{x}</p>)}</section></div> }
 function Decision({ steps, hint }: { steps:string[]; hint:string }) { return <><div className="decision">{steps.map((s,i)=><div className="decision-row" key={s}><div className="question"><small>確認 {i+1}</small><strong>{s}</strong></div><div className="answer yes"><b>YES</b><span>{i === steps.length-1 ? "記入・次の作業へ" : "次の確認へ ↓"}</span></div><div className="answer no"><b>NO</b><span>対象外・見直す</span></div></div>)}</div><div className="decision-result">判断のしかた：{hint}</div></> }
 function Placeholder({ label }: { label:string }) { return <div className="placeholder"><div>▧</div><strong>ここに説明画像を入れる</strong><span>{label}</span></div> }
