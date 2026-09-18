@@ -12,6 +12,8 @@ type Screen = {
   ng?: string[];
   hint?: string;
   image?: string;
+  actionUrl?: string;
+  actionLabel?: string;
 };
 
 type StepData = {
@@ -34,11 +36,9 @@ const STEPS: StepData[] = [
       { type: "intro", title: "今回やること", lead: "企業がSNSを運用するときに、参考になるアカウントを30件探します。", hint: "今日は『条件に合うアカウントを見つけて、表に記録する』仕事です。" },
       { type: "why", title: "なぜ、この作業をするの？", steps: ["良いSNSアカウントを作りたい", "うまくいっているアカウントを研究する", "人気の理由と投稿内容を調べる", "良いところを今後の運用に活かす"] },
       { type: "goal", title: "完成イメージ", lead: "条件を満たす企業アカウントが、スプレッドシートに30件そろった状態です。", items: ["アカウント名", "Instagram URL", "フォロワー数", "投稿内容", "参考になるポイント", "代表的な投稿URL"] },
-      LIST("prepare", "始める前の準備", ["Instagramを開ける端末", "指定された検索キーワード", "記入用スプレッドシート", "投稿の日付とフォロワー数を確認できる状態"], "4つそろったら、作業を始められます。"),
-      PROCESS("作業の流れ", ["Instagramを開く", "指定キーワードで検索", "アカウントを見る", "3つの条件を確認", "スプレッドシートへ入力", "次のアカウントを探す"]),
-      LIST("points", "見るポイント", ["企業が運営しているか", "直近1か月以内にリール投稿があるか", "フォロワーが1万人以上か", "定期的に投稿されているか"], "フォロワー数だけで決めず、3つの条件を順番に見ます。"),
-      { type: "example", title: "記入の具体例", lead: "例：〇〇コーヒー公式｜12,500人｜新商品や店舗の紹介｜短い動画で商品の魅力が伝わる｜代表リールURL", image: "Instagram検索画面" },
-      { type: "compare", title: "OK例とNG例", ok: ["企業が運営している", "1か月以内にリール投稿あり", "フォロワー1万人以上", "定期的に投稿"], ng: ["長期間投稿がない", "投稿数が極端に少ない", "リールがほとんどない", "フォロワー1万人未満"] },
+      { type: "prepare", title: "始める前の準備", items: ["Instagramを開ける端末", "記入用スプレッドシート"], actionUrl: "https://docs.google.com/spreadsheets/d/1NfHeZFICoyZkaCZAvLTOme_ehrMebp4vzH_DNnTCVHc/copy", actionLabel: "スプレッドシートをコピーして開く" },
+      PROCESS("作業の流れ", ["インスタグラム、スプレッドシートを開く", "検索キーワードから選んで検索\n\n【検索キーワード】\n株式会社・企業公式・会社公式・コーポレート・採用・採用広報・中途採用・社員紹介・社員の日常・仕事風景・会社の日常・社長・営業会社・営業マン・ベンチャー企業・求人・フルリモート・在宅ワーク・営業会社 など", "アカウントを見る", "3つの条件に当てはまっているか確認\n\n【3つの条件】\n1. 企業アカウント\n2. FW1万人以上\n3. 再生数1万回以上のリールがある", "スプレッドシートへ記入", "次のアカウントを探す"]),
+      { type: "compare", title: "OK例とNG例", ok: ["企業が運営している", "フォロワー1万人以上", "直近1ヶ月以内に投稿がある"], ng: ["長期間投稿がない", "投稿数が極端に少ない", "リールがほとんどない", "フォロワー1万人未満"] },
       LIST("mistakes", "よくある失敗", ["個人アカウントを入れてしまう", "フォロワー数の単位を見間違える", "古い投稿だけで判断する", "URLをコピーし忘れる"], "入力前に、条件を上からもう一度確認しましょう。"),
       { type: "decision", title: "迷ったときの判断フロー", steps: ["企業が運営？", "1か月以内にリールあり？", "フォロワー1万人以上？"], hint: "3つともYES → 記入。1つでもNO → 対象外にして次を探す。" },
       { type: "video", title: "実際の操作方法を動画で見る", lead: "検索のしかたやURLのコピーなど、細かな画面操作は動画で確認します。", image: "STEP1 Instagram検索画面" },
@@ -199,7 +199,7 @@ export default function Home() {
   const screenKey = `${stepId}-${page}`;
   const allChecked = screen && (screen.type === "checklist" ? (screen.items || []).every((_, i) => saved.checks[`${screenKey}-${i}`]) : screen.type === "multiChecklist" ? Object.values(MULTI_CHECKS).flat().every((_, i) => saved.checks[`${screenKey}-${i}`]) : true);
 
-  const startStep = (id: number) => { const savedPage = saved.position[id] || 0; setStepId(id); setPage(savedPage); setSaved(s => ({ ...s, currentStep: id, lastWorkedStep: id, position: { ...s.position, [id]: savedPage } })); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
+  const startStep = (id: number) => { const savedPage = Math.min(saved.position[id] || 0, STEPS[id - 1].screens.length - 1); setStepId(id); setPage(savedPage); setSaved(s => ({ ...s, currentStep: id, lastWorkedStep: id, position: { ...s.position, [id]: savedPage } })); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
   const goHome = () => { setView("home"); window.scrollTo(0, 0); };
   const next = () => {
     if (page < step.screens.length - 1) {
@@ -333,7 +333,7 @@ function ScreenContent({ screen, step, saved, screenKey, updateCheck, updateForm
   if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
   if (screen.type === "multiChecklist") { let offset = 0; return <><Lead text={screen.lead} /><div className="multi-checks">{Object.entries(MULTI_CHECKS).map(([group, items]) => { const start = offset; offset += items.length; return <section key={group}><h3>{group}のチェック</h3><Checklist items={items} prefix={screenKey} offset={start} saved={saved} update={updateCheck}/></section>})}</div></> }
   if (screen.type === "form") return <><Lead text={screen.lead} /><div className="form-grid">{FORM_FIELDS.map((field, i) => <label key={field} className={i === 3 || i === 8 ? "wide" : ""}><span>{field}</span>{i === 3 || i === 8 ? <textarea value={saved.form[field] || ""} onChange={e => updateForm(field,e.target.value)} placeholder="短い言葉で書いてください" /> : <input value={saved.form[field] || ""} onChange={e => updateForm(field,e.target.value)} placeholder="ここに入力" />}</label>)}</div><p className="save-note">✓ 入力内容は自動保存されます</p></>;
-  return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.image && <Placeholder label={screen.image} />}</>;
+  return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.actionUrl && <a className="video-button" href={screen.actionUrl} target="_blank" rel="noopener noreferrer">▦　{screen.actionLabel}</a>}{screen.image && <Placeholder label={screen.image} />}</>;
 }
 
 function Lead({ text }: { text?: string }) { return text ? <p className="lesson-lead">{text}</p> : null; }
