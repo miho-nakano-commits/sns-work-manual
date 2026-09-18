@@ -142,7 +142,6 @@ const MULTI_CHECKS = {
 
 type SavedState = { completed: number[]; position: Record<number, number>; checks: Record<string, boolean>; form: Record<string, string>; currentStep: number; lastWorkedStep: number };
 type SessionUser = { id: string; name: string; role: "user" | "admin" };
-type LoginUser = SessionUser;
 type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null };
 const initialState: SavedState = { completed: [], position: {}, checks: {}, form: {}, currentStep: 1, lastWorkedStep: 1 };
 
@@ -159,7 +158,6 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [saved, setSaved] = useState<SavedState>(initialState);
   const [session, setSession] = useState<SessionUser | null>(null);
-  const [loginUsers, setLoginUsers] = useState<LoginUser[]>([]);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [ready, setReady] = useState(false);
   const [progressReady, setProgressReady] = useState(false);
@@ -175,10 +173,10 @@ export default function Home() {
           const data = await api<{ progress: SavedState }>("/api/progress");
           setSession(me.user); setSaved({ ...initialState, ...data.progress }); setProgressReady(true); setShowAdmin(me.user.role === "admin");
         } else {
-          const data = await api<{ users: LoginUser[]; needsSetup: boolean }>("/api/auth/users");
-          setLoginUsers(data.users); setNeedsSetup(data.needsSetup);
+          const data = await api<{ needsSetup: boolean }>("/api/auth/users");
+          setNeedsSetup(data.needsSetup);
         }
-      } catch { setLoginUsers([]); }
+      } catch {}
       setReady(true);
     })();
   }, []);
@@ -221,15 +219,15 @@ export default function Home() {
   };
   const logout = async () => {
     await api("/api/auth/logout", { method: "POST", body: "{}" });
-    const data = await api<{ users: LoginUser[]; needsSetup: boolean }>("/api/auth/users");
-    setSession(null); setProgressReady(false); setSaved(initialState); setLoginUsers(data.users); setNeedsSetup(data.needsSetup); setShowAdmin(false); setView("home");
+    const data = await api<{ needsSetup: boolean }>("/api/auth/users");
+    setSession(null); setProgressReady(false); setSaved(initialState); setNeedsSetup(data.needsSetup); setShowAdmin(false); setView("home");
   };
 
   if (!ready) return <main className="loading">読み込んでいます…</main>;
 
   if (!session) return needsSetup
     ? <SetupScreen onReady={finishLogin} />
-    : <LoginScreen users={loginUsers} onLogin={finishLogin} />;
+    : <LoginScreen onLogin={finishLogin} />;
 
   if (session.role === "admin" && showAdmin) return <AdminScreen user={session} onManual={() => setShowAdmin(false)} onLogout={logout} />;
 
@@ -278,10 +276,10 @@ function SetupScreen({ onReady }: { onReady: (user: SessionUser) => Promise<void
   return <main className="auth-page"><section className="auth-card setup-card"><div className="auth-emblem">S</div><p className="eyebrow">FIRST SETUP</p><h1>最初の管理者を登録</h1><p>最初に一度だけ、利用者を登録する管理者アカウントを作ります。</p><form onSubmit={submit}><label><span>管理者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} autoComplete="name" placeholder="例：支援員 田中" required /></label><label><span>管理者PIN（数字4桁）</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" autoComplete="new-password" placeholder="••••" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "管理者を登録する"}</button></form><p className="auth-note">登録後、管理者画面から30〜40名分の利用者名とPINを追加できます。</p></section></main>;
 }
 
-function LoginScreen({ users, onLogin }: { users: LoginUser[]; onLogin: (user: SessionUser) => Promise<void> }) {
-  const [userId, setUserId] = useState(""); const [pin, setPin] = useState(""); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
-  const submit = async (event: FormEvent) => { event.preventDefault(); setError(""); setBusy(true); try { const data = await api<{ user: SessionUser }>("/api/auth/login", { method: "POST", body: JSON.stringify({ userId, pin }) }); await onLogin(data.user); } catch (e) { setError(e instanceof Error ? e.message : "ログインできませんでした"); } finally { setBusy(false); } };
-  return <main className="auth-page"><section className="auth-card"><div className="auth-emblem">S</div><p className="eyebrow">SNS WORK QUEST</p><h1>SNSお仕事マニュアル</h1><p>自分の名前を選んで、4桁のPINを入力してください。</p><form onSubmit={submit}><label><span>利用者名</span><select value={userId} onChange={e => setUserId(e.target.value)} required><option value="">名前を選んでください</option>{users.map(user => <option key={user.id} value={user.id}>{user.name}{user.role === "admin" ? "（管理者）" : ""}</option>)}</select></label><label><span>4桁のPINコード</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" autoComplete="current-password" placeholder="••••" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" disabled={busy || !userId || pin.length !== 4}>{busy ? "確認中…" : "ログイン"}</button></form><p className="auth-note">PINを忘れた場合は、管理者へお知らせください。</p></section></main>;
+function LoginScreen({ onLogin }: { onLogin: (user: SessionUser) => Promise<void> }) {
+  const [name, setName] = useState(""); const [pin, setPin] = useState(""); const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
+  const submit = async (event: FormEvent) => { event.preventDefault(); setError(""); setBusy(true); try { const data = await api<{ user: SessionUser }>("/api/auth/login", { method: "POST", body: JSON.stringify({ name, pin }) }); await onLogin(data.user); } catch { setError("氏名またはPINコードが正しくありません。"); } finally { setBusy(false); } };
+  return <main className="auth-page"><section className="auth-card"><div className="auth-emblem">S</div><p className="eyebrow">SNS WORK QUEST</p><h1>SNSお仕事マニュアル</h1><p>氏名と4桁のPINコードを入力してください。</p><form onSubmit={submit} autoComplete="off"><label><span>氏名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} autoComplete="off" autoCorrect="off" spellCheck={false} placeholder="氏名を入力" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" autoComplete="new-password" placeholder="••••" required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="primary-button" disabled={busy || !name.trim() || pin.length !== 4}>{busy ? "確認中…" : "ログイン"}</button></form><p className="auth-note">PINを忘れた場合は、管理者へお知らせください。</p></section></main>;
 }
 
 function AdminScreen({ user, onManual, onLogout }: { user: SessionUser; onManual: () => void; onLogout: () => Promise<void> }) {
@@ -289,7 +287,7 @@ function AdminScreen({ user, onManual, onLogout }: { user: SessionUser; onManual
   const load = async () => { setLoading(true); try { const data = await api<{ users: AdminProgress[] }>("/api/admin/progress"); setRows(data.users); } catch (e) { setError(e instanceof Error ? e.message : "一覧を取得できませんでした"); } finally { setLoading(false); } };
   useEffect(() => { void load(); }, []);
   const addUser = async (event: FormEvent) => { event.preventDefault(); setBusy(true); setError(""); try { await api("/api/admin/users", { method: "POST", body: JSON.stringify({ name, pin }) }); setName(""); setPin(""); await load(); } catch (e) { setError(e instanceof Error ? e.message : "登録できませんでした"); } finally { setBusy(false); } };
-  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、選択する名前とPINを個別に伝えてください。</p></section><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>進捗率</th><th>現在</th><th>完了</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.progressRate}%` }} /></span><b>{row.progressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.completedCount} / 6</td><td>{formatDate(row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
+  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、入力する氏名とPINを個別に伝えてください。</p></section><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>進捗率</th><th>現在</th><th>完了</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.progressRate}%` }} /></span><b>{row.progressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.completedCount} / 6</td><td>{formatDate(row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
 }
 
 function formatDate(value: string | null) {
