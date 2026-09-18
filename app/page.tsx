@@ -212,6 +212,7 @@ export default function Home() {
   const back = () => { if (page > 0) { const previous = page - 1; setPage(previous); setSaved(s => ({ ...s, position: { ...s.position, [stepId]: previous }, currentStep: stepId, lastWorkedStep: stepId })); setHintOpen(false); window.scrollTo(0, 0); } else goHome(); };
   const updateCheck = (key: string, value: boolean) => setSaved(s => ({ ...s, checks: { ...s.checks, [key]: value } }));
   const updateForm = (field: string, value: string) => setSaved(s => ({ ...s, form: { ...s.form, [field]: value } }));
+  const markIncomplete = (id: number) => setSaved(s => ({ ...s, completed: s.completed.filter(step => step !== id), currentStep: id, lastWorkedStep: id }));
 
   const finishLogin = async (user: SessionUser) => {
     const data = await api<{ progress: SavedState }>("/api/progress");
@@ -231,7 +232,7 @@ export default function Home() {
 
   if (session.role === "admin" && showAdmin) return <AdminScreen user={session} onManual={() => setShowAdmin(false)} onLogout={logout} />;
 
-  if (view === "home") return <HomeScreen user={session} saved={saved} totalProgress={totalProgress} startStep={startStep} onLogout={logout} onAdmin={session.role === "admin" ? () => setShowAdmin(true) : undefined} saveStatus={saveStatus} />;
+  if (view === "home") return <HomeScreen user={session} saved={saved} totalProgress={totalProgress} startStep={startStep} markIncomplete={markIncomplete} onLogout={logout} onAdmin={session.role === "admin" ? () => setShowAdmin(true) : undefined} saveStatus={saveStatus} />;
   if (view === "basicDone") return <Celebration basic onHome={goHome} onNext={() => startStep(5)} />;
   if (view === "final") return <Celebration completed={saved.completed} onHome={goHome} />;
 
@@ -296,31 +297,31 @@ function formatDate(value: string | null) {
   return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(normalized));
 }
 
-function HomeScreen({ user, saved, totalProgress, startStep, onLogout, onAdmin, saveStatus }: { user: SessionUser; saved: SavedState; totalProgress: number; startStep: (id: number) => void; onLogout: () => Promise<void>; onAdmin?: () => void; saveStatus: "saved" | "saving" | "error" }) {
+function HomeScreen({ user, saved, totalProgress, startStep, markIncomplete, onLogout, onAdmin, saveStatus }: { user: SessionUser; saved: SavedState; totalProgress: number; startStep: (id: number) => void; markIncomplete: (id: number) => void; onLogout: () => Promise<void>; onAdmin?: () => void; saveStatus: "saved" | "saving" | "error" }) {
   const completed = saved.completed;
   return <main className="home">
     <header className="home-nav"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><span className={`save-state ${saveStatus}`}>{saveStatus === "saving" ? "保存中…" : saveStatus === "error" ? "保存できません" : "✓ 保存済み"}</span>{onAdmin && <button className="text-button" onClick={onAdmin}>管理者画面</button>}<button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header>
     <section className="hero">
       <div className="hero-copy"><p className="eyebrow">SNS WORK STARTER</p><h1>はじめての<br /><em>SNS運用</em><br />お仕事マニュアル</h1><p className="hero-lead">読むだけではなく、考えて、選んで、確認する。<br />一人で作業を始めるための体験型マニュアルです。</p><button className="primary-button large" onClick={() => startStep(saved.lastWorkedStep)}>{completed.length || Object.keys(saved.position).length ? "前回の続きから始める" : "STEP1からはじめる"} →</button></div>
-      <div className="hero-board"><div className="board-top"><span>YOUR PROGRESS</span><strong>{totalProgress}%</strong></div><div className="progress-track hero-track"><span style={{ width: `${totalProgress}%` }} /></div><p>{completed.length === 0 ? "最初のSTEPから、ゆっくり始めましょう。" : completed.length === 6 ? "すべてのSTEPをクリアしました！" : `STEP${completed.length}まで完了しています。`}</p><div className="skill-pills"><span>調べる</span><span>考える</span><span>つくる</span></div></div>
+      <div className="hero-board"><div className="board-top"><span>YOUR PROGRESS</span><strong>{totalProgress}%</strong></div><div className="progress-track hero-track"><span style={{ width: `${totalProgress}%` }} /></div><p>{completed.length === 0 ? "最初のSTEPから、ゆっくり始めましょう。" : completed.length === 6 ? "すべてのSTEPをクリアしました！" : `${completed.length} / 6 STEP完了しています。`}</p><div className="skill-pills"><span>調べる</span><span>考える</span><span>つくる</span></div></div>
     </section>
     <section className="user-progress-panel"><div className="progress-title"><div><p className="eyebrow">MY QUEST STATUS</p><h2>{user.name}さんの進捗</h2></div><strong>{totalProgress}%</strong></div><div className="user-progress-stats"><div><span>完了STEP</span><b>{completed.length} / 6</b></div><div><span>前回作業したSTEP</span><b>STEP {saved.lastWorkedStep}</b></div><div><span>現在のSTEP</span><b>STEP {saved.currentStep}</b></div></div><div className="step-status-list">{STEPS.map(step => { const status = completed.includes(step.id) ? "完了" : step.id === saved.currentStep ? "作業中" : "未実施"; return <button key={step.id} className={status === "完了" ? "complete" : status === "作業中" ? "current" : "pending"} onClick={() => startStep(step.id)}><span>STEP {step.id}</span><strong>{step.short}</strong><em>{status}</em></button>; })}</div></section>
     <section className="can-do"><p className="eyebrow">このアプリでできるようになること</p><div className="can-grid"><div><b>01</b><span>良いお手本を<br />見つける</span></div><div><b>02</b><span>理由を考えて<br />判断する</span></div><div><b>03</b><span>動画をつくり<br />自分で確認する</span></div></div></section>
     <section className="curriculum">
       <div className="section-heading"><div><p className="eyebrow">BASIC COURSE</p><h2>基本編</h2><p>まずは「調べる・編集する」仕事の基本から。</p></div><span className="course-badge">STEP 1—4</span></div>
-      <div className="step-grid">{STEPS.slice(0,4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} />)}</div>
+      <div className="step-grid">{STEPS.slice(0,4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
     </section>
     <section className="curriculum advanced">
       <div className="advanced-note"><span>LEVEL UP</span><strong>ここからは、基本編が問題なくできるようになった人向けです。</strong></div>
       <div className="section-heading"><div><p className="eyebrow">ADVANCED COURSE</p><h2>高難易度編</h2><p>企画から撮影・編集まで、一人で進める力をつけます。</p></div><span className="course-badge dark">STEP 5—6</span></div>
-      <div className="step-grid advanced-grid">{STEPS.slice(4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} />)}</div>
+      <div className="step-grid advanced-grid">{STEPS.slice(4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
     </section>
     <footer><span className="brand-mark">S</span><p>少しずつ、確実に。<br /><small>進み具合はアカウントごとに自動で保存されます。</small></p></footer>
   </main>
 }
 
-function StepCard({ step, completed, onStart }: { step: StepData; completed: boolean; onStart: () => void }) {
-  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : step.id > 4 ? "高難易度" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button></article>
+function StepCard({ step, completed, onStart, onIncomplete }: { step: StepData; completed: boolean; onStart: () => void; onIncomplete: () => void }) {
+  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : step.id > 4 ? "高難易度" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>未完に戻す</button>}</div></article>
 }
 
 function ScreenContent({ screen, step, saved, screenKey, updateCheck, updateForm }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void; updateForm:(k:string,v:string)=>void }) {
