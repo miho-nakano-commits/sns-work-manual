@@ -1,6 +1,7 @@
 import { getD1, jsonError, requireUser } from "../../server-auth";
 
 type ProgressRow = { current_step: number; completed_steps: string; positions: string; checks: string; form_values: string; last_worked_step: number; updated_at: string | null };
+const TOTAL_STEPS = 4;
 
 function parseJson<T>(value: string, fallback: T): T {
   try { return JSON.parse(value) as T; } catch { return fallback; }
@@ -8,13 +9,14 @@ function parseJson<T>(value: string, fallback: T): T {
 
 function serialize(row?: ProgressRow | null) {
   if (!row) return { completed: [], position: {}, checks: {}, form: {}, currentStep: 1, lastWorkedStep: 1, updatedAt: null };
+  const completed = parseJson<number[]>(row.completed_steps, []).filter(step => Number.isInteger(step) && step >= 1 && step <= TOTAL_STEPS);
   return {
-    completed: parseJson<number[]>(row.completed_steps, []),
+    completed,
     position: parseJson<Record<number, number>>(row.positions, {}),
     checks: parseJson<Record<string, boolean>>(row.checks, {}),
     form: parseJson<Record<string, string>>(row.form_values, {}),
-    currentStep: row.current_step,
-    lastWorkedStep: row.last_worked_step,
+    currentStep: Math.min(TOTAL_STEPS, Math.max(1, row.current_step || 1)),
+    lastWorkedStep: Math.min(TOTAL_STEPS, Math.max(1, row.last_worked_step || 1)),
     updatedAt: row.updated_at,
   };
 }
@@ -33,9 +35,9 @@ export async function PUT(request: Request) {
   try {
     const user = await requireUser();
     const body = await request.json() as Record<string, unknown>;
-    const completed = Array.isArray(body.completed) ? body.completed.filter(v => Number.isInteger(v) && Number(v) >= 1 && Number(v) <= 6) : [];
-    const currentStep = Math.min(6, Math.max(1, Number(body.currentStep) || 1));
-    const lastWorkedStep = Math.min(6, Math.max(1, Number(body.lastWorkedStep) || currentStep));
+    const completed = Array.isArray(body.completed) ? body.completed.filter(v => Number.isInteger(v) && Number(v) >= 1 && Number(v) <= TOTAL_STEPS) : [];
+    const currentStep = Math.min(TOTAL_STEPS, Math.max(1, Number(body.currentStep) || 1));
+    const lastWorkedStep = Math.min(TOTAL_STEPS, Math.max(1, Number(body.lastWorkedStep) || currentStep));
     const position = body.position && typeof body.position === "object" ? body.position : {};
     const checks = body.checks && typeof body.checks === "object" ? body.checks : {};
     const form = body.form && typeof body.form === "object" ? body.form : {};

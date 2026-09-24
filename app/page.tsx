@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 type Screen = {
-  type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "checklist" | "form" | "multiChecklist";
+  type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "checklist";
   title: string;
   lead?: string;
   items?: string[];
@@ -89,55 +89,14 @@ const STEPS: StepData[] = [
       { type: "video", title: "実際の操作方法を動画で見る", lead: "カット・テロップ・BGM・保存の操作を動画で確認します。", image: "STEP4 編集操作画面" },
       LIST("checklist", "完成チェック", ["動画が途中で切れていない", "不要な部分が残っていない", "テロップに誤字なし", "テロップが読みやすい", "BGMが入っている", "音量がおかしくない", "最初から最後まで再生できる", "指定形式で保存されている"])
     ]
-  },
-  {
-    id: 5, short: "投稿企画を考える", title: "企業SNSの投稿企画を考える", outcome: "伸びた動画を参考に、自社向けの企画をまとめられる", tone: "pink", videoUrl: "VIDEO_URL_STEP5",
-    screens: [
-      { type: "intro", title: "ここからは高難易度編", lead: "基本編が問題なくできるようになった人向けです。企業SNSの投稿企画を考えます。", hint: "ゼロから思いつこうとせず、良い動画を分解して考えます。" },
-      { type: "why", title: "企画の基本的な考え方", steps: ["伸びている動画を探す", "なぜ伸びたのか考える", "動画の構成を分ける", "自社向けに置き換える", "企画としてまとめる"] },
-      { type: "goal", title: "完成イメージ", lead: "誰に、何を、どのように見せるかが決まり、撮影を始められる企画書です。", items: ["企画タイトル", "見てほしい人", "動画の内容", "最初の3秒", "撮影するもの・素材", "期待する反応"] },
-      LIST("prepare", "始める前の準備", ["紹介する企業・商品情報", "参考にする動画", "企画を考える時間", "撮影できる場所・素材の候補"]),
-      PROCESS("企画を作る流れ", ["参考動画を選ぶ", "伸びた理由を書く", "構成を分ける", "自社の商品に置き換える", "最初の3秒を決める", "企画フォームを埋める"]),
-      LIST("points", "参考にしてよいポイント", ["動画の構成", "見せ方", "切り口", "テンポ"], "他社投稿をそのままコピーしてはいけません。会社名・言葉・映像を写すのではなく、仕組みを参考にします。"),
-      { type: "example", title: "置き換えの具体例", lead: "参考：『3秒で完成品→作り方』の構成。自社向け：『完成した商品→制作の裏側』に置き換える。", image: "参考動画の構成メモ" },
-      { type: "compare", title: "OK例とNG例", ok: ["構成を自社向けに置き換える", "自社の商品・言葉を使う", "見てほしい人が明確"], ng: ["文章をそのまま使う", "映像をまねして区別できない", "誰向けか決まっていない"] },
-      LIST("mistakes", "よくある失敗", ["内容を詰め込みすぎる", "最初の3秒が決まっていない", "撮れない内容を企画する", "視聴者の反応を考えていない"]),
-      { type: "decision", title: "この企画で撮影できる？", steps: ["誰向けか明確？", "他社のコピーではない？", "必要な素材を用意できる？"], hint: "すべてYES → 企画フォームへ。NOがある → 内容を1つ減らすか置き換える。" },
-      { type: "form", title: "企画テンプレート", lead: "入力は自動保存されます。途中で閉じても続きから書けます。" },
-      { type: "video", title: "実際の操作方法を動画で見る", lead: "参考動画の分け方と企画書の書き方を確認できます。", image: "STEP5 企画作成画面" },
-      LIST("checklist", "企画の完成チェック", ["すべての項目を入力した", "誰に見てほしいか明確", "最初の3秒が決まっている", "他社投稿のコピーではない", "必要な素材を用意できる"])
-    ]
-  },
-  {
-    id: 6, short: "自分で動画を作る", title: "企画・撮影・編集まで自分で動画を作る", outcome: "企画から提出まで、一人で動画制作を進められる", tone: "navy", videoUrl: "VIDEO_URL_STEP6",
-    screens: [
-      { type: "intro", title: "今回の目標", lead: "企画・撮影準備・撮影・編集・提出まで、一人で完成させます。", hint: "一度に全部考えず、今いる工程だけに集中します。" },
-      { type: "why", title: "仕事の全体像", steps: ["企画", "撮影準備", "撮影", "素材確認", "編集", "BGM・テロップ", "完成確認", "提出"] },
-      { type: "goal", title: "完成イメージ", lead: "企画に合った縦動画が完成し、自分で確認して指定の場所へ提出できた状態です。", items: ["企画どおりの内容", "明るく安定した映像", "見やすい編集", "正しい形式で提出"] },
-      LIST("prepare", "撮影前の準備", ["企画書を読み直す", "撮影するものをそろえる", "端末の充電・空き容量を確認", "明るさと背景を確認"]),
-      PROCESS("作業の流れ", ["企画を確認", "撮影準備", "複数回撮影", "素材確認", "編集", "BGM・テロップ", "完成確認", "提出"]),
-      LIST("points", "撮影時の基本", ["縦向きで撮る", "手ブレに注意", "明るい場所で撮影", "余計なものが映っていないか確認", "1回だけでなく複数回撮影", "前後を少し長めに撮る"]),
-      { type: "example", title: "撮影の具体例", lead: "撮影ボタンを押して1秒待つ → 動作をする → 終わって1秒待つ。前後の余白があると編集しやすくなります。", image: "縦向き撮影の見本" },
-      { type: "compare", title: "OK例とNG例", ok: ["縦向き・明るい", "同じ場面を複数回撮る", "背景が整理されている"], ng: ["横向きで撮る", "暗く手ブレしている", "関係ない物や人が映る"] },
-      LIST("mistakes", "よくある失敗", ["レンズが汚れている", "録画開始直後に動き出す", "1回だけ撮って終わる", "素材確認前に撮影場所を片づける"]),
-      { type: "decision", title: "編集へ進んでよい？", steps: ["必要な場面が全部ある？", "明るさ・手ブレに問題なし？", "使える撮影が2つ以上ある？"], hint: "すべてYES → 編集へ。NOがある → その場面だけ撮り直す。" },
-      { type: "video", title: "実際の操作方法を動画で見る", lead: "撮影設定から書き出し・提出までの操作を確認できます。", image: "STEP6 撮影・編集画面" },
-      { type: "multiChecklist", title: "3段階の完成チェック", lead: "各段階を確認すると、最後の完了ボタンが使えます。" }
-    ]
   }
 ];
-
-const FORM_FIELDS = ["企画タイトル", "参考動画URL", "誰に見てほしいか", "動画の内容", "最初の3秒で何を見せるか", "撮影するもの", "必要な素材", "使用するBGM", "視聴者にどんな反応をしてほしいか"];
-const MULTI_CHECKS = {
-  "撮影前": ["企画書を確認した", "必要な物をそろえた", "充電と空き容量を確認した", "背景と明るさを確認した"],
-  "撮影後": ["必要な場面が全部ある", "手ブレ・暗さを確認した", "複数回撮影した", "余計なものが映っていない"],
-  "編集後": ["最初から最後まで再生した", "誤字と音量を確認した", "企画どおりの内容になった", "指定形式で保存した"]
-};
 
 type SavedState = { completed: number[]; position: Record<number, number>; checks: Record<string, boolean>; form: Record<string, string>; currentStep: number; lastWorkedStep: number };
 type SessionUser = { id: string; name: string; role: "user" | "admin" };
 type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null };
 const initialState: SavedState = { completed: [], position: {}, checks: {}, form: {}, currentStep: 1, lastWorkedStep: 1 };
+const TOTAL_STEPS = STEPS.length;
 
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers || {}) } });
@@ -147,7 +106,7 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export default function Home() {
-  const [view, setView] = useState<"home" | "step" | "basicDone" | "final">("home");
+  const [view, setView] = useState<"home" | "step" | "complete">("home");
   const [stepId, setStepId] = useState(1);
   const [page, setPage] = useState(0);
   const [saved, setSaved] = useState<SavedState>(initialState);
@@ -186,26 +145,26 @@ export default function Home() {
 
   const step = STEPS[stepId - 1];
   const screen = step.screens[page];
-  const totalProgress = Math.round((saved.completed.length / STEPS.length) * 100);
+  const completedSteps = saved.completed.filter(id => id >= 1 && id <= TOTAL_STEPS);
+  const totalProgress = Math.round((completedSteps.length / TOTAL_STEPS) * 100);
   const pageProgress = Math.round(((page + 1) / step.screens.length) * 100);
   const screenKey = `${stepId}-${page}`;
-  const allChecked = screen && (screen.type === "checklist" ? (screen.items || []).every((_, i) => saved.checks[`${screenKey}-${i}`]) : screen.type === "multiChecklist" ? Object.values(MULTI_CHECKS).flat().every((_, i) => saved.checks[`${screenKey}-${i}`]) : true);
+  const allChecked = screen && (screen.type === "checklist" ? (screen.items || []).every((_, i) => saved.checks[`${screenKey}-${i}`]) : true);
 
-  const startStep = (id: number) => { const savedPage = Math.min(saved.position[id] || 0, STEPS[id - 1].screens.length - 1); setStepId(id); setPage(savedPage); setSaved(s => ({ ...s, currentStep: id, lastWorkedStep: id, position: { ...s.position, [id]: savedPage } })); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
+  const startStep = (requestedId: number) => { const id = Math.min(TOTAL_STEPS, Math.max(1, requestedId)); const savedPage = Math.min(saved.position[id] || 0, STEPS[id - 1].screens.length - 1); setStepId(id); setPage(savedPage); setSaved(s => ({ ...s, currentStep: id, lastWorkedStep: id, position: { ...s.position, [id]: savedPage } })); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
   const goHome = () => { setView("home"); window.scrollTo(0, 0); };
   const next = () => {
     if (page < step.screens.length - 1) {
       const nextPage = page + 1; setPage(nextPage); setSaved(s => ({ ...s, currentStep: stepId, lastWorkedStep: stepId, position: { ...s.position, [stepId]: nextPage } })); setHintOpen(false); window.scrollTo(0, 0); return;
     }
     const completed = Array.from(new Set([...saved.completed, stepId]));
-    const nextStep = Math.min(stepId + 1, 6);
+    const nextStep = Math.min(stepId + 1, TOTAL_STEPS);
     setSaved(s => ({ ...s, completed, currentStep: nextStep, lastWorkedStep: nextStep, position: { ...s.position, [stepId]: page } }));
-    if (stepId === 4) setView("basicDone"); else if (stepId === 6) setView("final"); else { setStepId(stepId + 1); setPage(0); setView("step"); }
+    if (stepId === TOTAL_STEPS) setView("complete"); else { setStepId(stepId + 1); setPage(0); setView("step"); }
     window.scrollTo(0, 0);
   };
   const back = () => { if (page > 0) { const previous = page - 1; setPage(previous); setSaved(s => ({ ...s, position: { ...s.position, [stepId]: previous }, currentStep: stepId, lastWorkedStep: stepId })); setHintOpen(false); window.scrollTo(0, 0); } else goHome(); };
   const updateCheck = (key: string, value: boolean) => setSaved(s => ({ ...s, checks: { ...s.checks, [key]: value } }));
-  const updateForm = (field: string, value: string) => setSaved(s => ({ ...s, form: { ...s.form, [field]: value } }));
   const markIncomplete = (id: number) => setSaved(s => ({ ...s, completed: s.completed.filter(step => step !== id), currentStep: id, lastWorkedStep: id }));
 
   const finishLogin = async (user: SessionUser) => {
@@ -227,8 +186,7 @@ export default function Home() {
   if (session.role === "admin" && showAdmin) return <AdminScreen user={session} onManual={() => setShowAdmin(false)} onLogout={logout} />;
 
   if (view === "home") return <HomeScreen user={session} saved={saved} totalProgress={totalProgress} startStep={startStep} markIncomplete={markIncomplete} onLogout={logout} onAdmin={session.role === "admin" ? () => setShowAdmin(true) : undefined} saveStatus={saveStatus} />;
-  if (view === "basicDone") return <Celebration basic onHome={goHome} onNext={() => startStep(5)} />;
-  if (view === "final") return <Celebration completed={saved.completed} onHome={goHome} />;
+  if (view === "complete") return <Celebration completed={completedSteps} onHome={goHome} />;
 
   return (
     <main className="app-shell">
@@ -250,9 +208,9 @@ export default function Home() {
         <section className={`lesson tone-${step.tone}`}>
           <div className="mobile-progress"><span>STEP {stepId}　{page + 1} / {step.screens.length}</span><strong>{pageProgress}%</strong></div>
           <div className="progress-track mobile"><span style={{ width: `${pageProgress}%` }} /></div>
-          <p className="section-kicker">{screen.type === "checklist" || screen.type === "multiChecklist" ? "最後の確認" : `LESSON ${String(page + 1).padStart(2, "0")}`}</p>
+          <p className="section-kicker">{screen.type === "checklist" ? "最後の確認" : `LESSON ${String(page + 1).padStart(2, "0")}`}</p>
           <h2>{screen.title}</h2>
-          <ScreenContent screen={screen} step={step} saved={saved} screenKey={screenKey} updateCheck={updateCheck} updateForm={updateForm} />
+          <ScreenContent screen={screen} step={step} saved={saved} screenKey={screenKey} updateCheck={updateCheck} />
           {screen.hint && <div className="hint-wrap"><button className="hint-button" onClick={() => setHintOpen(!hintOpen)} aria-expanded={hintOpen}>💡 ヒントを見る</button>{hintOpen && <div className="hint-box">{screen.hint}</div>}</div>}
           <div className="lesson-actions">
             <button className="secondary-button" onClick={back}>← 戻る</button>
@@ -282,7 +240,7 @@ function AdminScreen({ user, onManual, onLogout }: { user: SessionUser; onManual
   const load = async () => { setLoading(true); try { const data = await api<{ users: AdminProgress[] }>("/api/admin/progress"); setRows(data.users); } catch (e) { setError(e instanceof Error ? e.message : "一覧を取得できませんでした"); } finally { setLoading(false); } };
   useEffect(() => { void load(); }, []);
   const addUser = async (event: FormEvent) => { event.preventDefault(); setBusy(true); setError(""); try { await api("/api/admin/users", { method: "POST", body: JSON.stringify({ name, pin }) }); setName(""); setPin(""); await load(); } catch (e) { setError(e instanceof Error ? e.message : "登録できませんでした"); } finally { setBusy(false); } };
-  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、入力する氏名とPINを個別に伝えてください。</p></section><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>進捗率</th><th>現在</th><th>完了</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.progressRate}%` }} /></span><b>{row.progressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.completedCount} / 6</td><td>{formatDate(row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
+  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、入力する氏名とPINを個別に伝えてください。</p></section><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>進捗率</th><th>現在</th><th>完了</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.progressRate}%` }} /></span><b>{row.progressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.completedCount} / {TOTAL_STEPS}</td><td>{formatDate(row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
 }
 
 function formatDate(value: string | null) {
@@ -292,40 +250,35 @@ function formatDate(value: string | null) {
 }
 
 function HomeScreen({ user, saved, totalProgress, startStep, markIncomplete, onLogout, onAdmin, saveStatus }: { user: SessionUser; saved: SavedState; totalProgress: number; startStep: (id: number) => void; markIncomplete: (id: number) => void; onLogout: () => Promise<void>; onAdmin?: () => void; saveStatus: "saved" | "saving" | "error" }) {
-  const completed = saved.completed;
+  const completed = saved.completed.filter(id => id >= 1 && id <= TOTAL_STEPS);
+  const currentStep = Math.min(TOTAL_STEPS, Math.max(1, saved.currentStep));
+  const lastWorkedStep = Math.min(TOTAL_STEPS, Math.max(1, saved.lastWorkedStep));
   return <main className="home">
     <header className="home-nav"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><span className={`save-state ${saveStatus}`}>{saveStatus === "saving" ? "保存中…" : saveStatus === "error" ? "保存できません" : "✓ 保存済み"}</span>{onAdmin && <button className="text-button" onClick={onAdmin}>管理者画面</button>}<button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header>
     <section className="hero">
-      <div className="hero-copy"><p className="eyebrow">SNS WORK STARTER</p><h1>はじめての<br /><em>SNS運用</em><br />お仕事マニュアル</h1><p className="hero-lead">読むだけではなく、考えて、選んで、確認する。<br />一人で作業を始めるための体験型マニュアルです。</p><button className="primary-button large" onClick={() => startStep(saved.lastWorkedStep)}>{completed.length || Object.keys(saved.position).length ? "前回の続きから始める" : "STEP1からはじめる"} →</button></div>
-      <div className="hero-board"><div className="board-top"><span>YOUR PROGRESS</span><strong>{totalProgress}%</strong></div><div className="progress-track hero-track"><span style={{ width: `${totalProgress}%` }} /></div><p>{completed.length === 0 ? "最初のSTEPから、ゆっくり始めましょう。" : completed.length === 6 ? "すべてのSTEPをクリアしました！" : `${completed.length} / 6 STEP完了しています。`}</p><div className="skill-pills"><span>調べる</span><span>考える</span><span>つくる</span></div></div>
+      <div className="hero-copy"><p className="eyebrow">SNS WORK STARTER</p><h1>はじめての<br /><em>SNS運用</em><br />お仕事マニュアル</h1><p className="hero-lead">読むだけではなく、考えて、選んで、確認する。<br />一人で作業を始めるための体験型マニュアルです。</p><button className="primary-button large" onClick={() => startStep(lastWorkedStep)}>{completed.length || Object.keys(saved.position).length ? "前回の続きから始める" : "STEP1からはじめる"} →</button></div>
+      <div className="hero-board"><div className="board-top"><span>YOUR PROGRESS</span><strong>{totalProgress}%</strong></div><div className="progress-track hero-track"><span style={{ width: `${totalProgress}%` }} /></div><p>{completed.length === 0 ? "最初のSTEPから、ゆっくり始めましょう。" : completed.length === TOTAL_STEPS ? "すべてのSTEPをクリアしました！" : `${completed.length} / ${TOTAL_STEPS} STEP完了しています。`}</p><div className="skill-pills"><span>調べる</span><span>考える</span><span>つくる</span></div></div>
     </section>
-    <section className="user-progress-panel"><div className="progress-title"><div><p className="eyebrow">MY QUEST STATUS</p><h2>{user.name}さんの進捗</h2></div><strong>{totalProgress}%</strong></div><div className="user-progress-stats"><div><span>完了STEP</span><b>{completed.length} / 6</b></div><div><span>前回作業したSTEP</span><b>STEP {saved.lastWorkedStep}</b></div><div><span>現在のSTEP</span><b>STEP {saved.currentStep}</b></div></div><div className="step-status-list">{STEPS.map(step => { const status = completed.includes(step.id) ? "完了" : step.id === saved.currentStep ? "作業中" : "未実施"; return <button key={step.id} className={status === "完了" ? "complete" : status === "作業中" ? "current" : "pending"} onClick={() => startStep(step.id)}><span>STEP {step.id}</span><strong>{step.short}</strong><em>{status}</em></button>; })}</div></section>
+    <section className="user-progress-panel"><div className="progress-title"><div><p className="eyebrow">MY QUEST STATUS</p><h2>{user.name}さんの進捗</h2></div><strong>{totalProgress}%</strong></div><div className="user-progress-stats"><div><span>完了STEP</span><b>{completed.length} / {TOTAL_STEPS}</b></div><div><span>前回作業したSTEP</span><b>STEP {lastWorkedStep}</b></div><div><span>現在のSTEP</span><b>STEP {currentStep}</b></div></div><div className="step-status-list">{STEPS.map(step => { const status = completed.includes(step.id) ? "完了" : step.id === currentStep ? "作業中" : "未実施"; return <button key={step.id} className={status === "完了" ? "complete" : status === "作業中" ? "current" : "pending"} onClick={() => startStep(step.id)}><span>STEP {step.id}</span><strong>{step.short}</strong><em>{status}</em></button>; })}</div></section>
     <section className="can-do"><p className="eyebrow">このアプリでできるようになること</p><div className="can-grid"><div><b>01</b><span>良いお手本を<br />見つける</span></div><div><b>02</b><span>理由を考えて<br />判断する</span></div><div><b>03</b><span>動画をつくり<br />自分で確認する</span></div></div></section>
     <section className="curriculum">
       <div className="section-heading"><div><p className="eyebrow">BASIC COURSE</p><h2>基本編</h2><p>まずは「調べる・編集する」仕事の基本から。</p></div><span className="course-badge">STEP 1—4</span></div>
-      <div className="step-grid">{STEPS.slice(0,4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
-    </section>
-    <section className="curriculum advanced">
-      <div className="advanced-note"><span>LEVEL UP</span><strong>ここからは、基本編が問題なくできるようになった人向けです。</strong></div>
-      <div className="section-heading"><div><p className="eyebrow">ADVANCED COURSE</p><h2>高難易度編</h2><p>企画から撮影・編集まで、一人で進める力をつけます。</p></div><span className="course-badge dark">STEP 5—6</span></div>
-      <div className="step-grid advanced-grid">{STEPS.slice(4).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
+      <div className="step-grid">{STEPS.map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
     </section>
     <footer><span className="brand-mark">S</span><p>少しずつ、確実に。<br /><small>進み具合はアカウントごとに自動で保存されます。</small></p></footer>
   </main>
 }
 
 function StepCard({ step, completed, onStart, onIncomplete }: { step: StepData; completed: boolean; onStart: () => void; onIncomplete: () => void }) {
-  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : step.id > 4 ? "高難易度" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>未完に戻す</button>}</div></article>
+  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>未完に戻す</button>}</div></article>
 }
 
-function ScreenContent({ screen, step, saved, screenKey, updateCheck, updateForm }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void; updateForm:(k:string,v:string)=>void }) {
+function ScreenContent({ screen, step, saved, screenKey, updateCheck }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void }) {
   if (screen.type === "why" || screen.type === "process") return <><Lead text={screen.lead} /><Flow steps={screen.steps || []} /></>;
   if (screen.type === "decision") return <Decision steps={screen.steps || []} hint={screen.hint || ""} />;
   if (screen.type === "compare") return <Compare ok={screen.ok || []} ng={screen.ng || []} />;
   if (screen.type === "video") return <><Lead text={screen.lead} /><Placeholder label={screen.image || "操作説明画面"} /><a className="video-button" href={step.videoUrl} onClick={e => { if (step.videoUrl.startsWith("VIDEO_URL")) { e.preventDefault(); alert("動画URLは準備中です。script内の設定値から差し替えられます。"); } }}>▶　実際の操作方法を動画で見る</a><p className="small-note">動画URLは準備中です</p></>;
   if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
-  if (screen.type === "multiChecklist") { let offset = 0; return <><Lead text={screen.lead} /><div className="multi-checks">{Object.entries(MULTI_CHECKS).map(([group, items]) => { const start = offset; offset += items.length; return <section key={group}><h3>{group}のチェック</h3><Checklist items={items} prefix={screenKey} offset={start} saved={saved} update={updateCheck}/></section>})}</div></> }
-  if (screen.type === "form") return <><Lead text={screen.lead} /><div className="form-grid">{FORM_FIELDS.map((field, i) => <label key={field} className={i === 3 || i === 8 ? "wide" : ""}><span>{field}</span>{i === 3 || i === 8 ? <textarea value={saved.form[field] || ""} onChange={e => updateForm(field,e.target.value)} placeholder="短い言葉で書いてください" /> : <input value={saved.form[field] || ""} onChange={e => updateForm(field,e.target.value)} placeholder="ここに入力" />}</label>)}</div><p className="save-note">✓ 入力内容は自動保存されます</p></>;
   return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.actionUrl && <a className="video-button" href={screen.actionUrl} target="_blank" rel="noopener noreferrer">▦　{screen.actionLabel}</a>}{screen.image && <Placeholder label={screen.image} />}</>;
 }
 
@@ -359,7 +312,8 @@ function Decision({ steps, hint }: { steps:string[]; hint:string }) { return <><
 function Placeholder({ label }: { label:string }) { return <div className="placeholder"><div>▧</div><strong>ここに説明画像を入れる</strong><span>{label}</span></div> }
 function Checklist({ items, prefix, offset=0, saved, update }: { items:string[]; prefix:string; offset?:number; saved:SavedState; update:(k:string,v:boolean)=>void }) { return <div className="checklist">{items.map((x,i)=>{const key=`${prefix}-${i+offset}`; return <label key={key} className={saved.checks[key] ? "checked" : ""}><input type="checkbox" checked={!!saved.checks[key]} onChange={e=>update(key,e.target.checked)} /><span className="fake-check">✓</span><strong>{x}</strong></label>})}</div> }
 
-function Celebration({ basic, completed=[], onHome, onNext }: { basic?:boolean; completed?:number[]; onHome:()=>void; onNext?:()=>void }) {
+function Celebration({ completed=[], onHome }: { completed?:number[]; onHome:()=>void }) {
   const levels = STEPS.map(s => s.outcome);
-  return <main className="celebration"><header className="topbar"><button className="brand-button" onClick={onHome}><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></button></header><section className="celebrate-hero"><div className="seal">✓</div><p className="eyebrow">{basic ? "BASIC COURSE COMPLETE" : "ALL COURSE COMPLETE"}</p><h1>{basic ? "基本編クリア" : "あなたができるようになったこと"}</h1><p>{basic ? "4つの基本スキルが身につきました。次は、自分で考えて作る仕事に挑戦できます。" : "ここまで進めた経験が、SNSのお仕事を一人で進める力になります。"}</p></section><section className="level-list">{levels.map((x,i)=>{const done=basic ? i<4 : completed.includes(i+1); return <div key={x} className={done?"cleared":""}><span>LEVEL {i+1}</span><strong>{x}</strong><em>{done?"✓ CLEAR":"未完了"}</em></div>})}</section><div className="celebrate-actions"><button className="secondary-button" onClick={onHome}>トップへ戻る</button>{basic && onNext && <button className="primary-button" onClick={onNext}>高難易度編へ進む →</button>}</div></main>
+  const allDone = completed.length === TOTAL_STEPS;
+  return <main className="celebration"><header className="topbar"><button className="brand-button" onClick={onHome}><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></button></header><section className="celebrate-hero"><div className="seal">✓</div><p className="eyebrow">{allDone ? "ALL QUESTS COMPLETE" : "STEP COMPLETE"}</p><h1>{allDone ? "すべてのSTEPをクリア" : "STEP4 完了"}</h1><p>{allDone ? "4つの基本スキルが身につきました。ここまで進めた経験が、SNSのお仕事を一人で進める力になります。" : "STEP4を完了しました。トップへ戻って、ほかのSTEPも確認しましょう。"}</p></section><section className="level-list">{levels.map((x,i)=>{const done=completed.includes(i+1); return <div key={x} className={done?"cleared":""}><span>LEVEL {i+1}</span><strong>{x}</strong><em>{done?"✓ CLEAR":"未完了"}</em></div>})}</section><div className="celebrate-actions"><button className="secondary-button" onClick={onHome}>トップへ戻る</button></div></main>
 }
