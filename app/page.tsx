@@ -100,7 +100,8 @@ const ANALYSIS_SHEET_URL_KEY = "analysisSheetUrl";
 
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers || {}) } });
-  const data = await response.json() as T & { error?: string };
+  const data = await response.json() as T & { error?: string; debug?: { code?: string; detail?: string } };
+  if (!response.ok && data.debug) console.error(`[${data.debug.code || "API_ERROR"}] ${data.debug.detail || "詳細なし"}`);
   if (!response.ok) throw new Error(data.error || "処理に失敗しました");
   return data;
 }
@@ -298,7 +299,7 @@ function ScreenContent({ screen, step, saved, screenKey, updateCheck, analysisSh
 }
 
 function AnalysisSheetAction({ url, busy, error, onCreate }: { url: string; busy: boolean; error: string; onCreate: () => Promise<void> }) {
-  return <div className="analysis-sheet-action">{url ? <a className="video-button" href={url} target="_blank" rel="noopener noreferrer">▦　分析シートを開く</a> : <button type="button" className="video-button" onClick={() => void onCreate()} disabled={busy}>{busy ? "分析シートを作成しています…" : "▦　分析シートを作成する"}</button>}{error && <p className="form-error" role="alert">{error}</p>}</div>;
+  return <div className="analysis-sheet-action">{url ? <a className="video-button" href={url} target="_blank" rel="noopener noreferrer">▦　記入用スプレッドシートを開く</a> : <button type="button" className="video-button" onClick={() => void onCreate()} disabled={busy}>{busy ? "スプレッドシートを準備しています…" : "▦　記入用スプレッドシートを開く"}</button>}{error && <p className="form-error" role="alert">{error}</p>}</div>;
 }
 
 function Lead({ text }: { text?: string }) { return text ? <p className="lesson-lead">{text}</p> : null; }
