@@ -12,8 +12,7 @@ type Screen = {
   ng?: string[];
   hint?: string;
   image?: string;
-  actionUrl?: string;
-  actionLabel?: string;
+  action?: "analysisSheet";
 };
 
 type StepData = {
@@ -36,7 +35,7 @@ const STEPS: StepData[] = [
       { type: "intro", title: "今回やること", lead: "企業がSNSを運用するときに、参考になるアカウントを30件探します。", hint: "今日は『条件に合うアカウントを見つけて、表に記録する』仕事です。" },
       { type: "why", title: "なぜ、この作業をするの？", steps: ["良いSNSアカウントを作りたい", "うまくいっているアカウントを研究する", "人気の理由と投稿内容を調べる", "良いところを今後の運用に活かす"] },
       { type: "goal", title: "完成イメージ", lead: "条件を満たす企業アカウントが、スプレッドシートに30件そろった状態です。", items: ["アカウント名", "Instagram URL", "フォロワー数", "投稿内容", "参考になるポイント", "代表的な投稿URL"] },
-      { type: "prepare", title: "始める前の準備", items: ["Instagramを開ける端末", "記入用スプレッドシート"], actionUrl: "https://docs.google.com/spreadsheets/d/1NfHeZFICoyZkaCZAvLTOme_ehrMebp4vzH_DNnTCVHc/copy", actionLabel: "スプレッドシートをコピーして開く" },
+      { type: "prepare", title: "始める前の準備", items: ["Instagramを開ける端末", "記入用スプレッドシート"], action: "analysisSheet" },
       PROCESS("作業の流れ", ["インスタグラム、スプレッドシートを開く", "検索キーワードから選んで検索\n\n【検索キーワード】\n株式会社・企業公式・会社公式・コーポレート・採用・採用広報・中途採用・社員紹介・社員の日常・仕事風景・会社の日常・社長・営業会社・営業マン・ベンチャー企業・求人・フルリモート・在宅ワーク・営業会社 など", "アカウントを見る", "3つの条件に当てはまっているか確認\n\n【3つの条件】\n1. 企業アカウント\n2. FW1万人以上\n3. 再生数1万回以上のリールがある", "スプレッドシートへ記入", "次のアカウントを探す"]),
       { type: "compare", title: "OK例とNG例", ok: ["企業が運営している", "フォロワー1万人以上", "直近1ヶ月以内に投稿がある"], ng: ["長期間投稿がない", "投稿数が極端に少ない", "リールがほとんどない", "フォロワー1万人未満"] },
       LIST("mistakes", "よくある失敗", ["個人アカウントを入れてしまう", "フォロワー数の単位を見間違える", "古い投稿だけで判断する", "URLをコピーし忘れる"], "入力前に、条件を上からもう一度確認しましょう。"),
@@ -97,6 +96,7 @@ type SessionUser = { id: string; name: string; role: "user" | "admin" };
 type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null };
 const initialState: SavedState = { completed: [], position: {}, checks: {}, form: {}, currentStep: 1, lastWorkedStep: 1 };
 const TOTAL_STEPS = STEPS.length;
+const ANALYSIS_SHEET_URL_KEY = "analysisSheetUrl";
 
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers || {}) } });
@@ -117,6 +117,8 @@ export default function Home() {
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">("saved");
   const [showAdmin, setShowAdmin] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
+  const [analysisSheetBusy, setAnalysisSheetBusy] = useState(false);
+  const [analysisSheetError, setAnalysisSheetError] = useState("");
 
   useEffect(() => {
     void (async () => {
@@ -166,6 +168,19 @@ export default function Home() {
   const back = () => { if (page > 0) { const previous = page - 1; setPage(previous); setSaved(s => ({ ...s, position: { ...s.position, [stepId]: previous }, currentStep: stepId, lastWorkedStep: stepId })); setHintOpen(false); window.scrollTo(0, 0); } else goHome(); };
   const updateCheck = (key: string, value: boolean) => setSaved(s => ({ ...s, checks: { ...s.checks, [key]: value } }));
   const markIncomplete = (id: number) => setSaved(s => ({ ...s, completed: s.completed.filter(step => step !== id), currentStep: id, lastWorkedStep: id }));
+  const createAnalysisSheet = async () => {
+    if (analysisSheetBusy) return;
+    setAnalysisSheetBusy(true); setAnalysisSheetError("");
+    try {
+      const data = await api<{ url: string }>("/api/analysis-sheet", { method: "POST", body: "{}" });
+      setSaved(s => ({ ...s, form: { ...s.form, [ANALYSIS_SHEET_URL_KEY]: data.url } }));
+    } catch (error) {
+      console.error("Analysis sheet request failed", error);
+      setAnalysisSheetError("分析シートを作成できませんでした。管理者にお問い合わせください。");
+    } finally {
+      setAnalysisSheetBusy(false);
+    }
+  };
 
   const finishLogin = async (user: SessionUser) => {
     const data = await api<{ progress: SavedState }>("/api/progress");
@@ -210,7 +225,7 @@ export default function Home() {
           <div className="progress-track mobile"><span style={{ width: `${pageProgress}%` }} /></div>
           <p className="section-kicker">{screen.type === "checklist" ? "最後の確認" : `LESSON ${String(page + 1).padStart(2, "0")}`}</p>
           <h2>{screen.title}</h2>
-          <ScreenContent screen={screen} step={step} saved={saved} screenKey={screenKey} updateCheck={updateCheck} />
+          <ScreenContent screen={screen} step={step} saved={saved} screenKey={screenKey} updateCheck={updateCheck} analysisSheetUrl={saved.form[ANALYSIS_SHEET_URL_KEY] || ""} analysisSheetBusy={analysisSheetBusy} analysisSheetError={analysisSheetError} createAnalysisSheet={createAnalysisSheet} />
           {screen.hint && <div className="hint-wrap"><button className="hint-button" onClick={() => setHintOpen(!hintOpen)} aria-expanded={hintOpen}>💡 ヒントを見る</button>{hintOpen && <div className="hint-box">{screen.hint}</div>}</div>}
           <div className="lesson-actions">
             <button className="secondary-button" onClick={back}>← 戻る</button>
@@ -273,13 +288,17 @@ function StepCard({ step, completed, onStart, onIncomplete }: { step: StepData; 
   return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>未完に戻す</button>}</div></article>
 }
 
-function ScreenContent({ screen, step, saved, screenKey, updateCheck }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void }) {
+function ScreenContent({ screen, step, saved, screenKey, updateCheck, analysisSheetUrl, analysisSheetBusy, analysisSheetError, createAnalysisSheet }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void; analysisSheetUrl: string; analysisSheetBusy: boolean; analysisSheetError: string; createAnalysisSheet: () => Promise<void> }) {
   if (screen.type === "why" || screen.type === "process") return <><Lead text={screen.lead} /><Flow steps={screen.steps || []} /></>;
   if (screen.type === "decision") return <Decision steps={screen.steps || []} hint={screen.hint || ""} />;
   if (screen.type === "compare") return <Compare ok={screen.ok || []} ng={screen.ng || []} />;
   if (screen.type === "video") return <><Lead text={screen.lead} /><Placeholder label={screen.image || "操作説明画面"} /><a className="video-button" href={step.videoUrl} onClick={e => { if (step.videoUrl.startsWith("VIDEO_URL")) { e.preventDefault(); alert("動画URLは準備中です。script内の設定値から差し替えられます。"); } }}>▶　実際の操作方法を動画で見る</a><p className="small-note">動画URLは準備中です</p></>;
   if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
-  return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.actionUrl && <a className="video-button" href={screen.actionUrl} target="_blank" rel="noopener noreferrer">▦　{screen.actionLabel}</a>}{screen.image && <Placeholder label={screen.image} />}</>;
+  return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.action === "analysisSheet" && <AnalysisSheetAction url={analysisSheetUrl} busy={analysisSheetBusy} error={analysisSheetError} onCreate={createAnalysisSheet} />}{screen.image && <Placeholder label={screen.image} />}</>;
+}
+
+function AnalysisSheetAction({ url, busy, error, onCreate }: { url: string; busy: boolean; error: string; onCreate: () => Promise<void> }) {
+  return <div className="analysis-sheet-action">{url ? <a className="video-button" href={url} target="_blank" rel="noopener noreferrer">▦　分析シートを開く</a> : <button type="button" className="video-button" onClick={() => void onCreate()} disabled={busy}>{busy ? "分析シートを作成しています…" : "▦　分析シートを作成する"}</button>}{error && <p className="form-error" role="alert">{error}</p>}</div>;
 }
 
 function Lead({ text }: { text?: string }) { return text ? <p className="lesson-lead">{text}</p> : null; }
