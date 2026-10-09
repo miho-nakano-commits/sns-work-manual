@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 type Screen = {
-  type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "checklist";
+  type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "referenceVideo" | "resources" | "checklist";
   title: string;
   lead?: string;
   items?: string[];
@@ -73,17 +73,10 @@ const STEPS: StepData[] = [
     id: 4, short: "動画を編集する", title: "用意された素材を使って動画を編集する", outcome: "素材を整理して、見やすい動画を1本完成できる", tone: "orange", videoUrl: "VIDEO_URL_STEP4",
     screens: [
       { type: "intro", title: "今回やること", lead: "用意された動画素材を使って、1本の動画を完成させます。", hint: "初めは撮影せず、『編集する』ことに集中します。" },
-      { type: "why", title: "なぜ、この作業をするの？", steps: ["用意された素材を見る", "良い部分を選ぶ", "見やすい順番につなぐ", "編集の基本を身につける"] },
-      { type: "goal", title: "完成イメージ", lead: "短くテンポがよく、文字と音が見やすい1本の縦動画です。", items: ["冒頭で内容が分かる", "不要な間がない", "読みやすいテロップ", "ちょうどよいBGM音量"] },
-      LIST("prepare", "始める前の準備", ["用意された動画素材", "指定された編集アプリ", "完成見本または指示書", "保存形式・提出場所の確認"]),
-      PROCESS("作業の流れ", ["素材を確認", "使う動画を選ぶ", "順番を決める", "不要部分をカット", "動画をつなぐ", "BGM・テロップ", "最初から再生", "保存・提出"]),
-      LIST("points", "編集の基本ルール", ["長すぎる部分はカット", "何も起きていない時間を減らす", "文字は読みやすい大きさ", "文字を画面いっぱいに入れない", "BGMを大きくしすぎない", "完成後は最初から最後まで再生"]),
-      { type: "example", title: "具体例", lead: "商品を手に取るまでの長い待ち時間を短く切り、動きが始まるところへつなぎます。", image: "動画編集タイムライン画面" },
-      { type: "compare", title: "OK例とNG例", ok: ["短くテンポよく切り替わる", "短く読みやすいテロップ", "声とBGMが両方聞こえる"], ng: ["何も起きない映像が長い", "画面いっぱいの長文", "BGMが大きすぎる"] },
-      LIST("mistakes", "よくある失敗", ["動画の最後が途中で切れる", "テロップに誤字がある", "書き出した動画を確認しない", "指定と違う形式で保存する"]),
-      { type: "decision", title: "提出してよい？", steps: ["最初から最後まで再生できる？", "文字と音に問題なし？", "指定形式で保存した？"], hint: "すべてYES → 提出。NOがある → その場所を直して再確認。" },
+      { type: "why", title: "なぜ、この作業をするの？", steps: ["用意された見本を見る", "用意された素材をダウンロード", "お手本と同じように動画を繋げてみる", "編集の基本を身につける"] },
+      { type: "referenceVideo", title: "お手本動画を見る", lead: "練習を始める前に、お手本動画を最初から最後まで再生しましょう。" },
+      { type: "resources", title: "練習の準備", lead: "必要な素材と完成見本を保存してから、CapCutを開きます。" },
       { type: "video", title: "実際の操作方法を動画で見る", lead: "カット・テロップ・BGM・保存の操作を動画で確認します。", image: "STEP4 編集操作画面" },
-      LIST("checklist", "完成チェック", ["動画が途中で切れていない", "不要な部分が残っていない", "テロップに誤字なし", "テロップが読みやすい", "BGMが入っている", "音量がおかしくない", "最初から最後まで再生できる", "指定形式で保存されている"])
     ]
   }
 ];
@@ -290,9 +283,24 @@ function ScreenContent({ screen, step, saved, screenKey, updateCheck, analysisSh
   if (screen.type === "why" || screen.type === "process") return <><Lead text={screen.lead} /><Flow steps={screen.steps || []} /></>;
   if (screen.type === "decision") return <Decision steps={screen.steps || []} hint={screen.hint || ""} />;
   if (screen.type === "compare") return <Compare ok={screen.ok || []} ng={screen.ng || []} />;
+  if (screen.type === "referenceVideo") return <><Lead text={screen.lead} /><ReferenceVideo /></>;
+  if (screen.type === "resources") return <><Lead text={screen.lead} /><EditingResources /></>;
   if (screen.type === "video") return <><Lead text={screen.lead} /><Placeholder label={screen.image || "操作説明画面"} /><a className="video-button" href={step.videoUrl} onClick={e => { if (step.videoUrl.startsWith("VIDEO_URL")) { e.preventDefault(); alert("動画URLは準備中です。script内の設定値から差し替えられます。"); } }}>▶　実際の操作方法を動画で見る</a><p className="small-note">動画URLは準備中です</p></>;
   if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
   return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.action === "analysisSheet" && <AnalysisSheetAction url={analysisSheetUrl} busy={analysisSheetBusy} error={analysisSheetError} onCreate={createAnalysisSheet} />}{screen.image && <Placeholder label={screen.image} />}</>;
+}
+
+function ReferenceVideo() {
+  return <div className="reference-video"><video controls playsInline preload="metadata"><source src="/step4-reference.mp4" type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、映像のつなぎ方やテンポを確認してください。</p></div>;
+}
+
+function EditingResources() {
+  return <div className="editing-resources">
+    <section><span>01</span><div><h3>用意された動画素材を保存</h3><button type="button" disabled>動画素材をまとめてダウンロード</button><p>素材は準備中です</p></div></section>
+    <section><span>02</span><div><h3>用意された音源を保存</h3><button type="button" disabled>音源をダウンロード</button><p>音源は準備中です</p></div></section>
+    <section><span>03</span><div><h3>完成見本を保存</h3><a href="/step4-reference.mp4" download="見本動画.mov">完成見本をダウンロード</a></div></section>
+    <section><span>04</span><div><h3>CapCutを開く</h3><a href="https://www.capcut.com/my-edit?from_page=landing_page&start_tab=video" target="_blank" rel="noopener noreferrer">CapCutを開く <span aria-hidden="true">↗</span></a></div></section>
+  </div>;
 }
 
 function AnalysisSheetAction({ url, busy, error, onCreate }: { url: string; busy: boolean; error: string; onCreate: () => Promise<void> }) {
