@@ -70,7 +70,7 @@ const STEPS: StepData[] = [
     ]
   },
   {
-    id: 4, short: "動画を編集する", title: "用意された素材を使って動画を編集する", outcome: "素材を整理して、見やすい動画を1本完成できる", tone: "orange", videoUrl: "VIDEO_URL_STEP4",
+    id: 4, short: "動画を編集する", title: "用意された素材を使って動画を編集する", outcome: "素材を整理して、見やすい動画を1本完成できる", tone: "orange", videoUrl: "/step4-operation-guide.mp4",
     screens: [
       { type: "intro", title: "今回やること", lead: "用意された動画素材を使って、1本の動画を完成させます。", hint: "初めは撮影せず、『編集する』ことに集中します。" },
       { type: "why", title: "なぜ、この作業をするの？", steps: ["用意された見本を見る", "用意された素材をダウンロード", "お手本と同じように動画を繋げてみる", "編集の基本を身につける"] },
@@ -285,7 +285,7 @@ function ScreenContent({ screen, step, saved, screenKey, updateCheck, analysisSh
   if (screen.type === "compare") return <Compare ok={screen.ok || []} ng={screen.ng || []} />;
   if (screen.type === "referenceVideo") return <><Lead text={screen.lead} /><ReferenceVideo /></>;
   if (screen.type === "resources") return <><Lead text={screen.lead} /><EditingResources /></>;
-  if (screen.type === "video") return <><Lead text={screen.lead} /><Placeholder label={screen.image || "操作説明画面"} /><a className="video-button" href={step.videoUrl} onClick={e => { if (step.videoUrl.startsWith("VIDEO_URL")) { e.preventDefault(); alert("動画URLは準備中です。script内の設定値から差し替えられます。"); } }}>▶　実際の操作方法を動画で見る</a><p className="small-note">動画URLは準備中です</p></>;
+  if (screen.type === "video") return <><Lead text={screen.lead} /><div className="reference-video"><video controls playsInline preload="metadata"><source src={step.videoUrl} type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、実際の編集操作を確認してください。</p></div></>;
   if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
   return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.action === "analysisSheet" && <AnalysisSheetAction url={analysisSheetUrl} busy={analysisSheetBusy} error={analysisSheetError} onCreate={createAnalysisSheet} />}{screen.image && <Placeholder label={screen.image} />}</>;
 }
