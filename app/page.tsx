@@ -298,7 +298,7 @@ function EditingResources() {
   return <div className="editing-resources">
     <section><span>01</span><div><h3>用意された動画素材を保存</h3><button type="button" disabled>動画素材をまとめてダウンロード</button><p>素材は準備中です</p></div></section>
     <section><span>02</span><div><h3>用意された画像素材を保存</h3><a href="/step4-image-materials.zip" download="Step4画像素材.zip">画像素材をまとめてダウンロード</a><p>添付画像7枚・ZIP形式</p></div></section>
-    <section><span>03</span><div><h3>完成見本を保存</h3><a href="/step4-reference.mp4" download="見本動画.mov">完成見本をダウンロード</a></div></section>
+    <section><span>03</span><div><h3>用意された音源を保存</h3><a href="/step4-audio-material.mp4" download="202610091811.mp4">音源をダウンロード</a><p>MP4形式</p></div></section>
     <section><span>04</span><div><h3>CapCutを開く</h3><a href="https://www.capcut.com/my-edit?from_page=landing_page&start_tab=video" target="_blank" rel="noopener noreferrer">CapCutを開く <span aria-hidden="true">↗</span></a></div></section>
   </div>;
 }
