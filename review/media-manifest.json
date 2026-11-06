@@ -1,0 +1,98 @@
+{
+  "step4-reference": {
+    "bytes": 8943825,
+    "sha256": "788949fffbbff9ccc02bcb849a97c73d88683819258f2e1a214004ece4c8b3cc"
+  },
+  "step4-guide": {
+    "bytes": 18711581,
+    "sha256": "97d565160e188e6c46cd20b338201f2a762e306ae210b278d90120b1be78a318"
+  },
+  "step4-images": {
+    "bytes": 20432912,
+    "sha256": "673d8b782c6957a603faa54c8a4b20478a128d1c366711d8de40c01efe7d0191"
+  },
+  "step4-audio": {
+    "bytes": 324747,
+    "sha256": "a82f3ff41edd7859ad884bbbce681df9f91cec51e1d4f0349074eba671a3f238"
+  },
+  "fruit-reference": {
+    "bytes": 22580444,
+    "sha256": "5516ca0c4174f4c2c9dfbfc3a5f48eefb7a370a6211e6d2f1127f2bab2c58f0f"
+  },
+  "fruit-images": {
+    "bytes": 11509896,
+    "sha256": "473d299b037222512fa96265c54eb29c1d5f2d3f55c0f29e5593ae1568d38659"
+  },
+  "sweets-house-reference": {
+    "bytes": 31212709,
+    "sha256": "f66caf8f752b861227766d33790d74167307750a8d5313bccc308a6bdf4b6acb"
+  },
+  "sweets-house-images": {
+    "bytes": 16324957,
+    "sha256": "e879aba70f725a3ffd710ba43d3aa60342d7fdd7dff33516485d8473d392cc43"
+  },
+  "quiz-reference": {
+    "bytes": 28615339,
+    "sha256": "6de963f8d0c7d3b7cf41313e10fe3a934ca563f8b9c8f58d0294e46c7954a2cd"
+  },
+  "quiz-images": {
+    "bytes": 9908939,
+    "sha256": "a4e8cc291acf7ae8bb3faa37fb517f5ce76d42309e027974bbebefa336b3053b"
+  },
+  "space-reference": {
+    "bytes": 29142731,
+    "sha256": "3d4e5e82754ecd9dc517c59e3e3270450c31fb2bf87f1ab0b5b23c11b23bad3f"
+  },
+  "space-images": {
+    "bytes": 20180718,
+    "sha256": "abaa2c3c2e558de494b258c9af120453bd41d5039108281a972136ccdc115fba"
+  },
+  "future-reference": {
+    "bytes": 29750302,
+    "sha256": "e0a2fd3d0cbd7e7ac286e8ac605e87e05fa62bd2f6488197cf47139e52bd7277"
+  },
+  "future-images": {
+    "bytes": 18654990,
+    "sha256": "086b49d0e0938e065d23d6530f49da7a6910c02870e94146634bc6dddc6882e9"
+  },
+  "tidying-reference": {
+    "bytes": 23166183,
+    "sha256": "d8d9c94010508107dc890214f2412c05dca7f4ab38e8433753a6335a2cb94735"
+  },
+  "tidying-images": {
+    "bytes": 17370906,
+    "sha256": "2d0e078c265acf896c4a1f164182b1e1b530b87e7f3c6b8aacae239a0e4f251b"
+  },
+  "seasons-reference": {
+    "bytes": 44300194,
+    "sha256": "fe0e1c147728e4555504c81b80c4be169be71fc994445867488acb32bbe53eca"
+  },
+  "seasons-images": {
+    "bytes": 19702580,
+    "sha256": "e68b5525a9cd1259452672bc1ced5eb6d024cd8b9dcffa8582e2c811e3d86da9"
+  },
+  "psychology-reference": {
+    "bytes": 31188601,
+    "sha256": "c1ecedee1a6a810b86812dddf7d4b5cde5a6928eb1ab7065576fc7cdc62cb23b"
+  },
+  "psychology-images": {
+    "bytes": 13002181,
+    "sha256": "4bbd694fc8b4ac7fb3a87595a23da123a2dfab3ac92223aa23d1f41c31e45191"
+  },
+  "dream-home-reference": {
+    "bytes": 43280223,
+    "sha256": "7c04875fc5896cb279f1c8461dc44fc9898df228d838edcb028401b4b5ac48c4"
+  },
+  "dream-home-images": {
+    "bytes": 14136315,
+    "sha256": "52f3e209191d3495ed158d39dee43be28cc8a2ae59117e0b9c8942cbdd163963"
+  },
+  "healing-reference": {
+    "bytes": 11988161,
+    "sha256": "09199e861290b6ba0ed2052537f28898ee6d48950cb557b67bf040c7556569cf"
+  },
+  "healing-images": {
+    "bytes": 9210797,
+    "sha256": "77018ee83af159cfe645ae4394cc3cf3abb16c971dfb30c067018ff6aa8c8932"
+  }
+}
