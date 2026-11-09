@@ -36,7 +36,14 @@ yarn-error.log*
 .vercel
 
 /dist/
+/dist-review/
 /.wrangler/
 /outputs/
 /work/
 *.tsbuildinfo
+
+# Retain media locally; upload approved files to private storage separately.
+/public/step5/
+/public/*.mp4
+/public/*.mov
+/public/*.zip

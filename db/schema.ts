@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { check, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -31,3 +31,15 @@ export const sessions = sqliteTable("sessions", {
   expiresAt: integer("expires_at").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+// Additive storage: no old account/progress rows are migrated or reinterpreted.
+export const userDriveSettings = sqliteTable("user_drive_settings", {
+  userId: text("user_id").primaryKey().references(() => users.id),
+  folderUrl: text("folder_url"), updatedBy: text("updated_by").references(() => users.id),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+export const driveSaveProgress = sqliteTable("drive_save_progress", {
+  userId: text("user_id").notNull().references(() => users.id), contentId: text("content_id").notNull(),
+  saved: integer("saved", {mode:"boolean"}).notNull().default(false),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, table => [primaryKey({columns:[table.userId, table.contentId]}), check("drive_saved_boolean", sql`${table.saved} IN (0,1)`)]);

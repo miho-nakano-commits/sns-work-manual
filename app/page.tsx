@@ -1,91 +1,22 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 
-type Screen = {
-  type: "intro" | "why" | "goal" | "prepare" | "process" | "points" | "example" | "compare" | "mistakes" | "decision" | "video" | "referenceVideo" | "resources" | "checklist";
-  title: string;
-  lead?: string;
-  items?: string[];
-  steps?: string[];
-  ok?: string[];
-  ng?: string[];
-  hint?: string;
-  image?: string;
-  action?: "analysisSheet";
-};
+import { mediaUrl } from "./media-catalog";
+import { STEPS, type Screen, type StepData } from "./curriculum";
+import { TOTAL_STEPS, STEP5_VIDEO_COUNT, STEP6_VIDEO_COUNT, practiceCompletedCount, STEP3_CHECK_PREFIX, initialState, normalizeProgress, changeCheck, markStepIncomplete, type SavedState } from "./progress";
+import { StepFiveContent } from "./step-five";
+import { prepareStepFive, selectPracticeVideo } from "./step-five-progress";
+import { practiceIds } from "./practice-catalog";
+import { Encouragement } from "./step-five";
+import { restoreDraft, useProgressSave, type ProgressBaseline } from "./use-progress-save";
+import { driveProgressView } from "./drive-model";
+import { DriveContext, DrivePanel, useDriveSave } from "./drive-ui";
+import { DriveFolderAdmin } from "./drive-admin";
+import { StaffReviewLink } from "./staff-review-link";
 
-type StepData = {
-  id: number;
-  short: string;
-  title: string;
-  outcome: string;
-  tone: string;
-  videoUrl: string;
-  screens: Screen[];
-};
-
-const PROCESS = (title: string, steps: string[], lead?: string): Screen => ({ type: "process", title, steps, lead });
-const LIST = (type: Screen["type"], title: string, items: string[], lead?: string): Screen => ({ type, title, items, lead });
-
-const STEPS: StepData[] = [
-  {
-    id: 1, short: "参考アカウントを探す", title: "インフルエンサー・クリエイターをリサーチする", outcome: "企業SNSの参考になるアカウントを、自分で選べる", tone: "blue", videoUrl: "VIDEO_URL_STEP1",
-    screens: [
-      { type: "intro", title: "今回やること", lead: "企業がSNSを運用するときに、参考になるアカウントを30件探します。", hint: "今日は『条件に合うアカウントを見つけて、表に記録する』仕事です。" },
-      { type: "why", title: "なぜ、この作業をするの？", steps: ["良いSNSアカウントを作りたい", "うまくいっているアカウントを研究する", "人気の理由と投稿内容を調べる", "良いところを今後の運用に活かす"] },
-      { type: "goal", title: "完成イメージ", lead: "条件を満たす企業アカウントが、スプレッドシートに30件そろった状態です。", items: ["アカウント名", "Instagram URL", "フォロワー数", "投稿内容", "参考になるポイント", "代表的な投稿URL"] },
-      { type: "prepare", title: "始める前の準備", items: ["Instagramを開ける端末", "記入用スプレッドシート"], action: "analysisSheet" },
-      PROCESS("作業の流れ", ["インスタグラム、スプレッドシートを開く", "検索キーワードから選んで検索\n\n【検索キーワード】\n株式会社・企業公式・会社公式・コーポレート・採用・採用広報・中途採用・社員紹介・社員の日常・仕事風景・会社の日常・社長・営業会社・営業マン・ベンチャー企業・求人・フルリモート・在宅ワーク・営業会社 など", "アカウントを見る", "3つの条件に当てはまっているか確認\n\n【3つの条件】\n1. 企業アカウント\n2. FW5000人以上\n3. 再生数1万回以上のリールがある", "スプレッドシートへ記入", "次のアカウントを探す"]),
-      { type: "compare", title: "OK例とNG例", ok: ["企業が運営している", "フォロワー5000人以上", "直近1ヶ月以内に投稿がある"], ng: ["長期間投稿がない", "投稿数が極端に少ない", "リールがほとんどない", "フォロワー5000人未満"] },
-      LIST("mistakes", "よくある失敗", ["個人アカウントを入れてしまう", "フォロワー数の単位を見間違える", "古い投稿だけで判断する", "URLをコピーし忘れる"], "入力前に、条件を上からもう一度確認しましょう。"),
-      { type: "decision", title: "迷ったときの判断フロー", steps: ["企業が運営？", "1か月以内にリールあり？", "フォロワー5000人以上？"], hint: "3つともYES → 記入。1つでもNO → 対象外にして次を探す。" },
-      LIST("checklist", "作業完了チェック", ["30アカウント記入できている", "すべて企業アカウント", "すべてフォロワー1万人以上", "直近1か月以内にリール投稿あり", "URLなどの記入漏れなし"], "すべて確認できたらSTEP1完了です。")
-    ]
-  },
-  {
-    id: 2, short: "伸びているリールを探す", title: "伸びているリール動画をリサーチする", outcome: "多く見られる動画の特徴を見つけられる", tone: "green", videoUrl: "VIDEO_URL_STEP2",
-    screens: [
-      { type: "intro", title: "今回やること", lead: "どんな動画が多くの人に見られているのかを調べます。", hint: "再生数と動画の中身を、セットで記録します。" },
-      { type: "why", title: "なぜ、この作業をするの？", steps: ["再生数が多い", "たくさんの人に見られている", "見てもらいやすい理由がある", "共通点を探す", "今後の動画作りに活かす"] },
-      { type: "goal", title: "完成イメージ", lead: "指定された件数のリールと、『伸びたと思う理由』が表に整理された状態です。", items: ["投稿URL", "再生回数", "フォロワー数", "リール動画の内容", "参考ポイント"] },
-      LIST("prepare", "始める前の準備", ["Instagramを開く", "スプレッドシートの「リール分析」タブを開く", "下記のジャンルから選んで検索\n\n・営業ノウハウ・営業トーク・営業術・営業テクニック・営業マンの日常\n・営業あるある・商談テクニック・新規営業・法人営業\n・社員の日常・会社の日常・社会人の日常・社会人vlog・仕事vlog・社員vlog\n・1日密着・リモートワーク・リモートワーカー・リモートワークの日常\n・在宅ワークvlog・フルリモート・フルリモートの日常\n・仕事術・仕事効率化・ビジネススキル・仕事で使える知識\n\n「営業マン 1日密着」\n「営業 社会人vlog」\n「フルリモート 社員の日常」\n「仕事術 リール」\n「営業あるある」など組み合わせてもOK", "音を出せる環境またはイヤホン"]),
-      PROCESS("作業の流れ", ["検索ワードで検索", "10万回再生以上のリールを探す", "伸びている動画を選ぶ", "特徴を見る", "スプレッドシートへ入力"]),
-      { type: "compare", title: "OK例とNG例", ok: ["10万回以上再生されている", "検索キーワードと関係がある内容", "参考になりそう！"], ng: ["なんとなく選ぶ", "10万回再生を下回っている"] },
-      LIST("mistakes", "よくある失敗", ["再生数といいね数を間違える", "動画を最後まで見ずに決める", "URLを別の投稿からコピーする", "検索キーワードとは全く違う内容"]),
-      { type: "decision", title: "この動画は記録する？", steps: ["検索キーワードと関連性ある？", "10万回再生より多い？", "リールがどんな内容か書き出せそう？"], hint: "3つともYES → 記入。NOがある → 別のリールを見る。" },
-      LIST("checklist", "作業完了チェック", ["指定件数を記入した", "投稿URLに間違いがない", "すべて10万回以上再生されている", "検索キーワードと関係がある", "リール動画の内容を記入した", "参考ポイントを記入した"])
-    ]
-  },
-  {
-    id: 3, short: "リールの共通点を探す", title: "伸びているリールの共通点探し", outcome: "伸びているリールの特徴を見つけて整理できる", tone: "purple", videoUrl: "VIDEO_URL_STEP3",
-    screens: [
-      { type: "intro", title: "今回やること", lead: "STEP2でピックアップした伸びているリールを見て、共通する特徴を調べます。", hint: "動画を見ながら、当てはまる特徴をスプレッドシートのプルダウンで選ぶ仕事です。" },
-      { type: "why", title: "なぜ、この作業をするの？", steps: ["伸びているリールを見る", "動画ごとの特徴を選ぶ", "いくつかの動画を比べる", "共通している特徴を見つける", "今後の動画作りに活かす"] },
-      { type: "goal", title: "完成イメージ", lead: "STEP2でピックアップしたリールについて、次の特徴がスプレッドシートに整理された状態です。", items: ["人は映っている？", "動画に文字は入っている？", "動画の最初に、目立つものがありますか？", "動画の長さ", "映像が切り替わる？", "話している声は入っている？", "どんな内容の動画？"] },
-      LIST("prepare", "始める前の準備", ["スプレッドシートの「共通点探し」タブを開く", "Instagramを開ける端末", "音を出せる環境またはイヤホン"]),
-      PROCESS("作業の流れ", ["STEP2でピックアップしたリールを開く", "リールを最初から最後まで見る", "7つの特徴を確認する", "スプレッドシートのプルダウンから選択する", "次のリールも同じように記録する"]),
-      LIST("mistakes", "よくある失敗", ["STEP2とは別のリールを見てしまう", "動画の文字と投稿文を間違える", "話している声と周りの音を間違える", "プルダウンの選択漏れがある"]),
-      LIST("checklist", "作業完了チェック", ["STEP2でピックアップしたリールを確認した", "すべての動画を最後まで見た", "7つの特徴を確認した", "プルダウンの選択漏れがない", "指定された件数を記録した"])
-    ]
-  },
-  {
-    id: 4, short: "動画を編集する", title: "用意された素材を使って動画を編集する", outcome: "素材を整理して、見やすい動画を1本完成できる", tone: "orange", videoUrl: "/step4-operation-guide.mp4",
-    screens: [
-      { type: "intro", title: "今回やること", lead: "用意された動画素材を使って、1本の動画を完成させます。", hint: "初めは撮影せず、『編集する』ことに集中します。" },
-      { type: "why", title: "なぜ、この作業をするの？", steps: ["用意された見本を見る", "用意された素材をダウンロード", "お手本と同じように動画を繋げてみる", "編集の基本を身につける"] },
-      { type: "referenceVideo", title: "お手本動画を見る", lead: "練習を始める前に、お手本動画を最初から最後まで再生しましょう。" },
-      { type: "resources", title: "練習の準備", lead: "必要な素材と完成見本を保存してから、CapCutを開きます。" },
-      { type: "video", title: "実際の操作方法を動画で見る", lead: "カット・テロップ・BGM・保存の操作を動画で確認します。", image: "STEP4 編集操作画面" },
-    ]
-  }
-];
-
-type SavedState = { completed: number[]; position: Record<number, number>; checks: Record<string, boolean>; form: Record<string, string>; currentStep: number; lastWorkedStep: number };
 type SessionUser = { id: string; name: string; role: "user" | "admin" };
-type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null };
-const initialState: SavedState = { completed: [], position: {}, checks: {}, form: {}, currentStep: 1, lastWorkedStep: 1 };
-const TOTAL_STEPS = STEPS.length;
+type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null; step5CompletedCount: number; step6CompletedCount: number; legacySubmissionCount: number; driveStep4Saved: boolean; driveStep5Count: number; driveStep6Count: number; driveProgressRate: number; driveCompletedCount: number; oldCompleted: number[]; driveUpdatedAt: string | null };
 const ANALYSIS_SHEET_URL_KEY = "analysisSheetUrl";
 
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
@@ -102,10 +33,15 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [saved, setSaved] = useState<SavedState>(initialState);
   const [session, setSession] = useState<SessionUser | null>(null);
+  const drive = useDriveSave(session?.id, session?.role === "admin");
+  const displaySaved = driveProgressView(saved, drive.data.checks);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [ready, setReady] = useState(false);
   const [progressReady, setProgressReady] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">("saved");
+  const [progressBaseline, setProgressBaseline] = useState<ProgressBaseline | null>(null);
+  const { saveStatus, flush, saveError, hasStoredDraft } = useProgressSave(saved, session?.id, progressReady && session?.role === "user", progressBaseline);
+  const combinedSaveStatus = drive.error ? "error" : drive.busy ? "saving" : saveStatus;
+  const [loadError, setLoadError] = useState("");
   const [showAdmin, setShowAdmin] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
   const [analysisSheetBusy, setAnalysisSheetBusy] = useState(false);
@@ -116,49 +52,61 @@ export default function Home() {
       try {
         const me = await api<{ user: SessionUser | null }>("/api/me");
         if (me.user) {
-          const data = await api<{ progress: SavedState }>("/api/progress");
-          setSession(me.user); setSaved({ ...initialState, ...data.progress }); setProgressReady(true); setShowAdmin(me.user.role === "admin");
+          const data = await api<{ progress: SavedState; revision: string }>("/api/progress");
+          setProgressBaseline({ progress: data.progress, revision: data.revision }); setSession(me.user); setSaved(restoreDraft(me.user.id, data.progress)); setProgressReady(true); setShowAdmin(me.user.role === "admin");
         } else {
           const data = await api<{ needsSetup: boolean }>("/api/auth/users");
           setNeedsSetup(data.needsSetup);
         }
-      } catch {}
+      } catch { setLoadError("進み具合を読み込めませんでした。ページを再読み込みしてください。"); }
       setReady(true);
     })();
   }, []);
-  useEffect(() => {
-    if (!session || !progressReady) return;
-    setSaveStatus("saving");
-    const timer = window.setTimeout(() => {
-      void api<{ ok: boolean }>("/api/progress", { method: "PUT", body: JSON.stringify(saved) })
-        .then(() => setSaveStatus("saved")).catch(() => setSaveStatus("error"));
-    }, 600);
-    return () => window.clearTimeout(timer);
-  }, [saved, session, progressReady]);
 
   const step = STEPS[stepId - 1];
   const screen = step.screens[page];
-  const completedSteps = saved.completed.filter(id => id >= 1 && id <= TOTAL_STEPS);
+  const completedSteps = displaySaved.completed.filter(id => id >= 1 && id <= TOTAL_STEPS);
   const totalProgress = Math.round((completedSteps.length / TOTAL_STEPS) * 100);
-  const pageProgress = Math.round(((page + 1) / step.screens.length) * 100);
-  const screenKey = `${stepId}-${page}`;
-  const allChecked = screen && (screen.type === "checklist" ? (screen.items || []).every((_, i) => saved.checks[`${screenKey}-${i}`]) : true);
+  const pageProgress = stepId >= 5 ? Math.round(practiceCompletedCount(displaySaved.checks, stepId) / practiceIds(stepId).length * 100) : Math.round(((page + 1) / step.screens.length) * 100);
+  const screenKey = stepId === 3 && screen.type === "checklist" ? STEP3_CHECK_PREFIX : `${stepId}-${page}`;
+  const allChecked = screen && (screen.type === "checklist" ? (screen.items || []).every((_, i) => displaySaved.checks[`${screenKey}-${i}`]) : screen.type === "practiceComplete" ? practiceCompletedCount(displaySaved.checks, stepId) === practiceIds(stepId).length : true);
 
-  const startStep = (requestedId: number) => { const id = Math.min(TOTAL_STEPS, Math.max(1, requestedId)); const savedPage = Math.min(saved.position[id] || 0, STEPS[id - 1].screens.length - 1); setStepId(id); setPage(savedPage); setSaved(s => ({ ...s, currentStep: id, lastWorkedStep: id, position: { ...s.position, [id]: savedPage } })); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
+  const startStep = (requestedId: number) => { const id = Math.min(TOTAL_STEPS, Math.max(1, requestedId)); const resumed = id >= 5 ? prepareStepFive(displaySaved, id) : saved; const savedPage = Math.min(resumed.position[id] || 0, STEPS[id - 1].screens.length - 1); setStepId(id); setPage(savedPage); setSaved({ ...saved, form: {...saved.form, ...resumed.form}, currentStep: id, lastWorkedStep: id, position: { ...resumed.position, [id]: savedPage } }); setView("step"); setHintOpen(false); window.scrollTo(0, 0); };
   const goHome = () => { setView("home"); window.scrollTo(0, 0); };
   const next = () => {
+    if (!allChecked) return;
     if (page < step.screens.length - 1) {
       const nextPage = page + 1; setPage(nextPage); setSaved(s => ({ ...s, currentStep: stepId, lastWorkedStep: stepId, position: { ...s.position, [stepId]: nextPage } })); setHintOpen(false); window.scrollTo(0, 0); return;
     }
-    const completed = Array.from(new Set([...saved.completed, stepId]));
+    const completed = stepId <= 3 ? Array.from(new Set([...saved.completed, stepId])) : saved.completed;
     const nextStep = Math.min(stepId + 1, TOTAL_STEPS);
-    setSaved(s => ({ ...s, completed, currentStep: nextStep, lastWorkedStep: nextStep, position: { ...s.position, [stepId]: page } }));
-    if (stepId === TOTAL_STEPS) setView("complete"); else { setStepId(stepId + 1); setPage(0); setView("step"); }
+    const progressed = normalizeProgress({ ...saved, completed, currentStep: nextStep, lastWorkedStep: nextStep, position: { ...saved.position, [stepId]: page } });
+    const navigation = nextStep >= 5 ? prepareStepFive(driveProgressView(progressed, drive.data.checks), nextStep) : progressed;
+    const resumed = {...progressed, form: {...progressed.form,...navigation.form}, position: navigation.position};
+    setSaved(resumed);
+    if (stepId === TOTAL_STEPS) setView("complete"); else { setStepId(stepId + 1); setPage(Math.min(resumed.position[stepId + 1] || 0, STEPS[stepId].screens.length - 1)); setView("step"); }
     window.scrollTo(0, 0);
   };
   const back = () => { if (page > 0) { const previous = page - 1; setPage(previous); setSaved(s => ({ ...s, position: { ...s.position, [stepId]: previous }, currentStep: stepId, lastWorkedStep: stepId })); setHintOpen(false); window.scrollTo(0, 0); } else goHome(); };
-  const updateCheck = (key: string, value: boolean) => setSaved(s => ({ ...s, checks: { ...s.checks, [key]: value } }));
-  const markIncomplete = (id: number) => setSaved(s => ({ ...s, completed: s.completed.filter(step => step !== id), currentStep: id, lastWorkedStep: id }));
+  const updateCheck = (key: string, value: boolean) => {
+    if (key === "4-5-4" || key.startsWith("practice:")) {
+      const contentId = key === "4-5-4" ? "step4-first-video" : key.split(":")[1];
+      void drive.saveCheck(contentId,value).then(ok=>{if(ok && stepId>=5 && value && practiceIds(stepId).every(id=>id===contentId || drive.data.checks[id])) stepFivePage(2);});
+      return;
+    }
+    const updated = changeCheck(stepId >= 5 ? prepareStepFive(saved, stepId) : saved, key, value);
+    // Historical completions stay historical even when the new checklist changes.
+    updated.completed = [...updated.completed.filter(id=>id<=3), ...saved.completed.filter(id=>id>=4)];
+    if (stepId >= 5 && practiceCompletedCount(updated.checks, stepId) === practiceIds(stepId).length && value) {
+      updated.position[stepId] = 2;
+      setPage(2);
+      window.scrollTo(0, 0);
+    }
+    setSaved(updated);
+  };
+  const selectVideo = (index: number) => { setSaved(state => {const selected = selectPracticeVideo(driveProgressView(state,drive.data.checks),index,stepId); return {...state,position:selected.position,form:{...state.form,...selected.form},currentStep:stepId,lastWorkedStep:stepId};}); setPage(1); window.scrollTo(0, 0); };
+  const stepFivePage = (target: number) => { setSaved(state => ({ ...state, position: { ...state.position, [stepId]: target } })); setPage(target); window.scrollTo(0, 0); };
+  const markIncomplete = (id: number) => { if(id>=4) {for(const contentId of id===4?["step4-first-video"]:practiceIds(id)) void drive.saveCheck(contentId,false);} else setSaved(s=>markStepIncomplete(s,id)); };
   const createAnalysisSheet = async () => {
     if (analysisSheetBusy) return;
     setAnalysisSheetBusy(true); setAnalysisSheetError("");
@@ -174,37 +122,44 @@ export default function Home() {
   };
 
   const finishLogin = async (user: SessionUser) => {
-    const data = await api<{ progress: SavedState }>("/api/progress");
-    setSession(user); setSaved({ ...initialState, ...data.progress }); setProgressReady(true); setShowAdmin(user.role === "admin"); setView("home");
+    const data = await api<{ progress: SavedState; revision: string }>("/api/progress");
+    setProgressBaseline({ progress: data.progress, revision: data.revision }); setSession(user); setSaved(restoreDraft(user.id, data.progress)); setProgressReady(true); setShowAdmin(user.role === "admin"); setView("home");
   };
   const logout = async () => {
+    if (!await drive.flush() || !await flush()) return;
     await api("/api/auth/logout", { method: "POST", body: "{}" });
     const data = await api<{ needsSetup: boolean }>("/api/auth/users");
-    setSession(null); setProgressReady(false); setSaved(initialState); setNeedsSetup(data.needsSetup); setShowAdmin(false); setView("home");
+    setSession(null); setProgressReady(false); setProgressBaseline(null); setSaved(initialState); setNeedsSetup(data.needsSetup); setShowAdmin(false); setView("home");
   };
 
+  const saveNotice = <>{saveError && <p className="form-error" role="alert">{saveError}</p>}{hasStoredDraft && <p role="status">この端末に未保存の記録を保管しています。古い記録は最新の進捗へ自動反映しません。</p>}</>;
+
   if (!ready) return <main className="loading">読み込んでいます…</main>;
+
+  if (loadError) return <main className="auth-page"><section className="auth-card"><h1>読み込みを確認してください</h1><p role="alert">{loadError}</p><button className="primary-button" onClick={() => window.location.reload()}>再読み込み</button></section></main>;
+
+  if (session && !drive.ready) return <main className="auth-page"><section className="auth-card"><h1>保存先を読み込んでいます</h1>{drive.error && <p role="alert">{drive.error}</p>}<button onClick={()=>window.location.reload()}>再読み込み</button></section></main>;
 
   if (!session) return needsSetup
     ? <SetupScreen onReady={finishLogin} />
     : <LoginScreen onLogin={finishLogin} />;
 
-  if (session.role === "admin" && showAdmin) return <AdminScreen user={session} onManual={() => setShowAdmin(false)} onLogout={logout} />;
+  if (session.role === "admin" && showAdmin) return <>{saveNotice}<StaffReviewLink /><AdminScreen user={session} onManual={() => setShowAdmin(false)} onLogout={logout} /></>;
 
-  if (view === "home") return <HomeScreen user={session} saved={saved} totalProgress={totalProgress} startStep={startStep} markIncomplete={markIncomplete} onLogout={logout} onAdmin={session.role === "admin" ? () => setShowAdmin(true) : undefined} saveStatus={saveStatus} />;
-  if (view === "complete") return <Celebration completed={completedSteps} onHome={goHome} />;
+  if (view === "home") return <>{saveNotice}<StaffReviewLink />{drive.error && <p className="form-error" role="alert">{drive.error}</p>}<HomeScreen user={session} saved={displaySaved} legacySaved={saved} totalProgress={totalProgress} startStep={startStep} markIncomplete={markIncomplete} onLogout={logout} onAdmin={session.role === "admin" ? () => setShowAdmin(true) : undefined} saveStatus={combinedSaveStatus} onRetry={() => {void drive.flush();void flush();}} /></>;
+  if (view === "complete") return <>{saveNotice}<Celebration completed={completedSteps} onHome={goHome} /></>;
 
   return (
-    <main className="app-shell">
+    <DriveContext.Provider value={{folderUrl:drive.data.folderUrl,ready:drive.ready,busy:drive.busy,error:drive.error,retry:()=>{void drive.flush();}}}><main className="app-shell">{saveNotice}
       <header className="topbar">
         <button className="brand-button" onClick={goHome} aria-label="トップへ戻る"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></button>
-        <div className="account-actions"><span>{session.name}さん</span><span className={`save-state ${saveStatus}`}>{saveStatus === "saving" ? "保存中…" : saveStatus === "error" ? "保存できません" : "✓ 保存済み"}</span><button className="text-button" onClick={goHome}>トップへ</button><button className="text-button" onClick={() => void logout()}>ログアウト</button></div>
+        <div className="account-actions"><span>{session.name}さん</span><SaveIndicator status={combinedSaveStatus} onRetry={() => {void drive.flush();void flush();}} /><button className="text-button" onClick={goHome}>トップへ</button><button className="text-button" onClick={() => void logout()}>ログアウト</button></div>
       </header>
       <div className="step-layout">
         <aside className="step-sidebar">
           <p className="eyebrow">STEP {stepId}</p>
           <h1>{step.short}</h1>
-          <div className="position"><strong>{page + 1} / {step.screens.length}</strong><span>{pageProgress}%</span></div>
+          <div className="position"><strong>{stepId >= 5 ? `${practiceCompletedCount(displaySaved.checks, stepId)} / ${practiceIds(stepId).length}本 完成` : `${page + 1} / ${step.screens.length}`}</strong><span>{pageProgress}%</span></div>
           <div className="progress-track" aria-label={`進捗 ${pageProgress}%`}><span style={{ width: `${pageProgress}%` }} /></div>
           <p className="now-label">いま：{screen.title}</p>
           <nav className="dot-nav" aria-label="このSTEPの画面">
@@ -212,21 +167,25 @@ export default function Home() {
           </nav>
         </aside>
         <section className={`lesson tone-${step.tone}`}>
-          <div className="mobile-progress"><span>STEP {stepId}　{page + 1} / {step.screens.length}</span><strong>{pageProgress}%</strong></div>
+          <div className="mobile-progress"><span>STEP {stepId}　{stepId >= 5 ? `${practiceCompletedCount(displaySaved.checks, stepId)} / ${practiceIds(stepId).length}本 完成` : `${page + 1} / ${step.screens.length}`}</span><strong>{pageProgress}%</strong></div>
           <div className="progress-track mobile"><span style={{ width: `${pageProgress}%` }} /></div>
           <p className="section-kicker">{screen.type === "checklist" ? "最後の確認" : `LESSON ${String(page + 1).padStart(2, "0")}`}</p>
-          <h2>{screen.title}</h2>
-          <ScreenContent screen={screen} step={step} saved={saved} screenKey={screenKey} updateCheck={updateCheck} analysisSheetUrl={saved.form[ANALYSIS_SHEET_URL_KEY] || ""} analysisSheetBusy={analysisSheetBusy} analysisSheetError={analysisSheetError} createAnalysisSheet={createAnalysisSheet} />
+          <h2>{screen.type === "intro" && stepId < 5 ? step.title : screen.title}</h2>
+          <ScreenContent key={`${stepId}-${page}`} screen={screen} step={step} saved={displaySaved} legacySaved={saved} screenKey={screenKey} updateCheck={updateCheck} analysisSheetUrl={saved.form[ANALYSIS_SHEET_URL_KEY] || ""} analysisSheetBusy={analysisSheetBusy} analysisSheetError={analysisSheetError} createAnalysisSheet={createAnalysisSheet} onSelectVideo={selectVideo} onExplanation={() => stepFivePage(0)} onShowClear={() => stepFivePage(2)} />
           {screen.hint && <div className="hint-wrap"><button className="hint-button" onClick={() => setHintOpen(!hintOpen)} aria-expanded={hintOpen}>💡 ヒントを見る</button>{hintOpen && <div className="hint-box">{screen.hint}</div>}</div>}
-          <div className="lesson-actions">
+          {screen.type !== "practiceVideo" && <div className="lesson-actions">
             <button className="secondary-button" onClick={back}>← 戻る</button>
             <button className="primary-button" onClick={next} disabled={!allChecked}>{page === step.screens.length - 1 ? `STEP${stepId} 完了` : "次へ →"}</button>
-          </div>
-          {!allChecked && <p className="disabled-note">すべてにチェックすると完了できます</p>}
+          </div>}
+          {!allChecked && <p className="disabled-note">{stepId >= 5 ? `${practiceIds(stepId).length}本すべてをGoogleドライブに保存し、チェックすると完了できます` : "すべてにチェックすると完了できます"}</p>}
         </section>
       </div>
-    </main>
+    </main></DriveContext.Provider>
   );
+}
+
+function SaveIndicator({ status, onRetry }: { status: "saved" | "saving" | "error"; onRetry: () => void }) {
+  return <span className={`save-state ${status}`} role="status">{status === "error" ? <button type="button" className="text-button" onClick={onRetry}>保存できません・再試行</button> : status === "saving" ? "保存中…" : "✓ 保存済み"}</span>;
 }
 
 function SetupScreen({ onReady }: { onReady: (user: SessionUser) => Promise<void> }) {
@@ -246,7 +205,7 @@ function AdminScreen({ user, onManual, onLogout }: { user: SessionUser; onManual
   const load = async () => { setLoading(true); try { const data = await api<{ users: AdminProgress[] }>("/api/admin/progress"); setRows(data.users); } catch (e) { setError(e instanceof Error ? e.message : "一覧を取得できませんでした"); } finally { setLoading(false); } };
   useEffect(() => { void load(); }, []);
   const addUser = async (event: FormEvent) => { event.preventDefault(); setBusy(true); setError(""); try { await api("/api/admin/users", { method: "POST", body: JSON.stringify({ name, pin }) }); setName(""); setPin(""); await load(); } catch (e) { setError(e instanceof Error ? e.message : "登録できませんでした"); } finally { setBusy(false); } };
-  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、入力する氏名とPINを個別に伝えてください。</p></section><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>進捗率</th><th>現在</th><th>完了</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.progressRate}%` }} /></span><b>{row.progressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.completedCount} / {TOTAL_STEPS}</td><td>{formatDate(row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
+  return <main className="admin-page"><header className="topbar"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><button className="text-button" onClick={onManual}>マニュアルを見る</button><button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header><div className="admin-wrap"><section className="admin-heading"><div><p className="eyebrow">ADMIN QUEST BOARD</p><h1>利用者の進捗</h1><p>利用者ごとの進み具合と最終作業日時を確認できます。</p></div><div className="admin-count"><strong>{rows.length}</strong><span>利用者</span></div></section><section className="admin-panel add-user"><h2>利用者を登録</h2><form onSubmit={addUser}><label><span>利用者名</span><input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="例：山田さん" required /></label><label><span>4桁PIN</span><input value={pin} onChange={e => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" pattern="\d{4}" placeholder="••••" required /></label><button className="primary-button" disabled={busy || pin.length !== 4}>{busy ? "登録中…" : "利用者を追加"}</button></form>{error && <p className="form-error" role="alert">{error}</p>}<p className="admin-help">利用者へ、入力する氏名とPINを個別に伝えてください。</p></section><DriveFolderAdmin /><section className="admin-panel"><div className="panel-title"><h2>進捗一覧</h2><button className="secondary-button compact" onClick={() => void load()}>更新</button></div>{loading ? <p>読み込んでいます…</p> : rows.length === 0 ? <div className="empty-state">利用者を登録すると、ここに進捗が表示されます。</div> : <div className="progress-table-wrap"><table className="progress-table"><thead><tr><th>利用者名</th><th>新方式の進捗率</th><th>現在</th><th>完了</th><th>STEP4の保存</th><th>STEP5の保存</th><th>STEP6の保存</th><th>旧記録（保管）</th><th>最終作業日時</th></tr></thead><tbody>{rows.map(row => <tr key={row.id}><td><strong>{row.name}</strong></td><td><div className="table-progress"><span><i style={{ width: `${row.driveProgressRate}%` }} /></span><b>{row.driveProgressRate}%</b></div></td><td>STEP {row.currentStep}</td><td>{row.driveCompletedCount} / {TOTAL_STEPS}</td><td>{row.driveStep4Saved ? "保存完了" : "保存未確認"}</td><td>{row.driveStep5Count} / {STEP5_VIDEO_COUNT}本</td><td>{row.driveStep6Count} / {STEP6_VIDEO_COUNT}本</td><td>旧完了STEP：{row.oldCompleted.join("・") || "なし"}<br />旧提出：Step5 {row.step5CompletedCount}本／Step6 {row.step6CompletedCount}本<br />番号のみの旧記録：{row.legacySubmissionCount}件</td><td>{formatDate(row.driveUpdatedAt || row.updatedAt)}</td></tr>)}</tbody></table></div>}</section></div></main>;
 }
 
 function formatDate(value: string | null) {
@@ -255,54 +214,59 @@ function formatDate(value: string | null) {
   return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(normalized));
 }
 
-function HomeScreen({ user, saved, totalProgress, startStep, markIncomplete, onLogout, onAdmin, saveStatus }: { user: SessionUser; saved: SavedState; totalProgress: number; startStep: (id: number) => void; markIncomplete: (id: number) => void; onLogout: () => Promise<void>; onAdmin?: () => void; saveStatus: "saved" | "saving" | "error" }) {
+function HomeScreen({ user, saved, legacySaved, totalProgress, startStep, markIncomplete, onLogout, onAdmin, saveStatus, onRetry }: { user: SessionUser; saved: SavedState; legacySaved: SavedState; totalProgress: number; startStep: (id: number) => void; markIncomplete: (id: number) => void; onLogout: () => Promise<void>; onAdmin?: () => void; saveStatus: "saved" | "saving" | "error"; onRetry: () => void }) {
   const completed = saved.completed.filter(id => id >= 1 && id <= TOTAL_STEPS);
   const currentStep = Math.min(TOTAL_STEPS, Math.max(1, saved.currentStep));
   const lastWorkedStep = Math.min(TOTAL_STEPS, Math.max(1, saved.lastWorkedStep));
   return <main className="home">
-    <header className="home-nav"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><span className={`save-state ${saveStatus}`}>{saveStatus === "saving" ? "保存中…" : saveStatus === "error" ? "保存できません" : "✓ 保存済み"}</span>{onAdmin && <button className="text-button" onClick={onAdmin}>管理者画面</button>}<button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header>
+    <p className="drive-panel">Step4〜Step6はGoogleドライブ保存方式の進捗を表示しています。旧方式で完了したSTEP：{legacySaved.completed.filter(id=>id>=4).join("・") || "なし"}（旧記録は保管）。以前の提出チェックを新しい保存完了チェックには自動変換していません。</p>
+    <header className="home-nav"><div className="brand"><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></div><div className="account-actions"><span>{user.name}さん</span><SaveIndicator status={saveStatus} onRetry={onRetry} />{onAdmin && <button className="text-button" onClick={onAdmin}>管理者画面</button>}<button className="text-button" onClick={() => void onLogout()}>ログアウト</button></div></header>
     <section className="hero">
       <div className="hero-copy"><p className="eyebrow">SNS WORK STARTER</p><h1>はじめての<br /><em>SNS運用</em><br />お仕事マニュアル</h1><p className="hero-lead">読むだけではなく、考えて、選んで、確認する。<br />一人で作業を始めるための体験型マニュアルです。</p><button className="primary-button large" onClick={() => startStep(lastWorkedStep)}>{completed.length || Object.keys(saved.position).length ? "前回の続きから始める" : "STEP1からはじめる"} →</button></div>
       <div className="hero-board"><div className="board-top"><span>YOUR PROGRESS</span><strong>{totalProgress}%</strong></div><div className="progress-track hero-track"><span style={{ width: `${totalProgress}%` }} /></div><p>{completed.length === 0 ? "最初のSTEPから、ゆっくり始めましょう。" : completed.length === TOTAL_STEPS ? "すべてのSTEPをクリアしました！" : `${completed.length} / ${TOTAL_STEPS} STEP完了しています。`}</p><div className="skill-pills"><span>調べる</span><span>考える</span><span>つくる</span></div></div>
     </section>
-    <section className="user-progress-panel"><div className="progress-title"><div><p className="eyebrow">MY QUEST STATUS</p><h2>{user.name}さんの進捗</h2></div><strong>{totalProgress}%</strong></div><div className="user-progress-stats"><div><span>完了STEP</span><b>{completed.length} / {TOTAL_STEPS}</b></div><div><span>前回作業したSTEP</span><b>STEP {lastWorkedStep}</b></div><div><span>現在のSTEP</span><b>STEP {currentStep}</b></div></div><div className="step-status-list">{STEPS.map(step => { const status = completed.includes(step.id) ? "完了" : step.id === currentStep ? "作業中" : "未実施"; return <button key={step.id} className={status === "完了" ? "complete" : status === "作業中" ? "current" : "pending"} onClick={() => startStep(step.id)}><span>STEP {step.id}</span><strong>{step.short}</strong><em>{status}</em></button>; })}</div></section>
+    <section className="user-progress-panel"><div className="progress-title"><div><p className="eyebrow">MY QUEST STATUS</p><h2>{user.name}さんの進捗</h2></div><strong>{totalProgress}%</strong></div><div className="user-progress-stats"><div><span>完了STEP</span><b>{completed.length} / {TOTAL_STEPS}</b></div><div><span>前回作業したSTEP</span><b>STEP {lastWorkedStep}</b></div><div><span>現在のSTEP</span><b>STEP {currentStep}</b></div></div><div className="step-status-list">{STEPS.map(step => { const status = completed.includes(step.id) ? "完了" : step.id === currentStep || saved.position[step.id] !== undefined || (step.id >= 5 && practiceCompletedCount(saved.checks, step.id) > 0) ? "作業中" : "未実施"; return <button key={step.id} className={status === "完了" ? "complete" : status === "作業中" ? "current" : "pending"} onClick={() => startStep(step.id)}><span>STEP {step.id}</span><strong>{step.short}</strong><em>{status}</em></button>; })}</div></section>
     <section className="can-do"><p className="eyebrow">このアプリでできるようになること</p><div className="can-grid"><div><b>01</b><span>良いお手本を<br />見つける</span></div><div><b>02</b><span>理由を考えて<br />判断する</span></div><div><b>03</b><span>動画をつくり<br />自分で確認する</span></div></div></section>
     <section className="curriculum">
-      <div className="section-heading"><div><p className="eyebrow">BASIC COURSE</p><h2>基本編</h2><p>まずは「調べる・編集する」仕事の基本から。</p></div><span className="course-badge">STEP 1—4</span></div>
-      <div className="step-grid">{STEPS.map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
+      <div className="section-heading"><div><p className="eyebrow">BASIC COURSE</p><h2>基本編</h2><p>まずは「調べる・編集する」仕事の基本から。</p></div><span className="course-badge">STEP 1—5</span></div>
+      <div className="step-grid">{STEPS.filter(s => s.id <= 5).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
     </section>
+    <section className="curriculum"><div className="section-heading"><div><p className="eyebrow">ADVANCED COURSE</p><h2>応用編</h2><p>ズームと音声編集を、自分のペースで練習しましょう。</p></div><span className="course-badge">STEP 6</span></div><div className="step-grid">{STEPS.filter(s => s.id === 6).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div></section>
     <footer><span className="brand-mark">S</span><p>少しずつ、確実に。<br /><small>進み具合はアカウントごとに自動で保存されます。</small></p></footer>
   </main>
 }
 
 function StepCard({ step, completed, onStart, onIncomplete }: { step: StepData; completed: boolean; onStart: () => void; onIncomplete: () => void }) {
-  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>未完に戻す</button>}</div></article>
+  return <article className={`step-card tone-${step.tone}`}><div className="card-number">{String(step.id).padStart(2,"0")}</div><div className="card-status">{completed ? "✓ クリア" : step.id === 6 ? "応用" : "基本"}</div><p>STEP {step.id}</p><h3>{step.short}</h3><div className="outcome"><span>できるようになること</span>{step.outcome}</div><div className="card-actions"><button onClick={onStart}>{completed ? "もう一度見る" : "このSTEPを始める"}<span>→</span></button>{completed && <button className="card-reset" onClick={onIncomplete}>{step.id >= 5 ? `${practiceIds(step.id).length}本のチェックを外す` : "未完に戻す"}</button>}</div></article>
 }
 
-function ScreenContent({ screen, step, saved, screenKey, updateCheck, analysisSheetUrl, analysisSheetBusy, analysisSheetError, createAnalysisSheet }: { screen: Screen; step: StepData; saved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void; analysisSheetUrl: string; analysisSheetBusy: boolean; analysisSheetError: string; createAnalysisSheet: () => Promise<void> }) {
+function ScreenContent({ screen, step, saved, legacySaved, screenKey, updateCheck, analysisSheetUrl, analysisSheetBusy, analysisSheetError, createAnalysisSheet, onSelectVideo, onExplanation, onShowClear }: { screen: Screen; step: StepData; saved: SavedState; legacySaved: SavedState; screenKey: string; updateCheck: (k:string,v:boolean)=>void; analysisSheetUrl: string; analysisSheetBusy: boolean; analysisSheetError: string; createAnalysisSheet: () => Promise<void>; onSelectVideo: (index: number) => void; onExplanation: () => void; onShowClear: () => void }) {
+  if (screen.type.startsWith("practice")) return <><Lead text={screen.lead} /><StepFiveContent stepId={step.id} type={screen.type} saved={saved} legacySaved={legacySaved} update={updateCheck} onSelectVideo={onSelectVideo} onExplanation={onExplanation} onShowClear={onShowClear} /></>;
+  if (screen.type === "intro" && step.id >= 5) return <><Lead text={screen.lead} /><Encouragement count={practiceCompletedCount(saved.checks, step.id)} /><Flow steps={screen.items || []} /></>;
   if (screen.type === "why" || screen.type === "process") return <><Lead text={screen.lead} /><Flow steps={screen.steps || []} /></>;
   if (screen.type === "decision") return <Decision steps={screen.steps || []} hint={screen.hint || ""} />;
   if (screen.type === "compare") return <Compare ok={screen.ok || []} ng={screen.ng || []} />;
   if (screen.type === "referenceVideo") return <><Lead text={screen.lead} /><ReferenceVideo /></>;
   if (screen.type === "resources") return <><Lead text={screen.lead} /><EditingResources /></>;
-  if (screen.type === "video") return <><Lead text={screen.lead} /><div className="reference-video"><video controls playsInline preload="metadata"><source src={step.videoUrl} type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、実際の編集操作を確認してください。</p></div></>;
-  if (screen.type === "checklist") return <><Lead text={screen.lead} /><Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
+  if (screen.type === "video") return <><Lead text={screen.lead} /><div className="reference-video"><video controls playsInline preload="metadata"><source src={mediaUrl(step.videoUrl)} type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、実際の編集操作を確認してください。</p></div></>;
+  if (screen.type === "checklist") return <><Lead text={screen.lead} />{step.id===4 && <><DrivePanel /><p className="practice-note">旧方式のSTEP4：{legacySaved.completed.includes(4)?"完了記録あり（保管）":"完了記録なし"}。旧提出チェックは保管し、Googleドライブ保存完了には自動変換しません。</p></>}<Checklist items={screen.items || []} prefix={screenKey} saved={saved} update={updateCheck} /></>;
   return <><Lead text={screen.lead} />{screen.items && <CardList items={screen.items} type={screen.type} />}{screen.action === "analysisSheet" && <AnalysisSheetAction url={analysisSheetUrl} busy={analysisSheetBusy} error={analysisSheetError} onCreate={createAnalysisSheet} />}{screen.image && <Placeholder label={screen.image} />}</>;
 }
 
 function ReferenceVideo() {
-  return <div className="reference-video"><video controls playsInline preload="metadata"><source src="/step4-reference.mp4" type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、映像のつなぎ方やテンポを確認してください。</p></div>;
+  return <div className="reference-video"><video controls playsInline preload="metadata"><source src={mediaUrl("/step4-reference.mp4")} type="video/mp4" />お使いのブラウザは動画の再生に対応していません。</video><p>再生ボタンを押して、映像のつなぎ方やテンポを確認してください。</p></div>;
 }
 
 function EditingResources() {
   return <div className="editing-resources">
-    <section><span>01</span><div><h3>用意された動画素材を保存</h3><a href="/step4-reference.mp4" download="見本動画.mov">動画素材をダウンロード</a><p>見本動画・MOV形式</p></div></section>
-    <section><span>02</span><div><h3>用意された画像素材を保存</h3><a href="/step4-image-materials.zip" download="Step4画像素材.zip">画像素材をまとめてダウンロード</a><p>添付画像7枚・ZIP形式</p></div></section>
-    <section><span>04</span><div><h3>CapCutを開く</h3><a href="https://www.capcut.com/my-edit?from_page=landing_page&start_tab=video" target="_blank" rel="noopener noreferrer">CapCutを開く <span aria-hidden="true">↗</span></a></div></section>
+    <section><span>01</span><div><h3>用意された見本動画を保存</h3><a href={mediaUrl("/step4-reference.mp4")} download="見本動画.mp4">見本動画をダウンロード</a><p>見本動画・MP4形式</p></div></section>
+    <section><span>02</span><div><h3>用意された画像素材を保存</h3><a href={mediaUrl("/step4-image-materials.zip")} download="Step4画像素材.zip">画像素材をまとめてダウンロード</a><p>添付画像7枚・ZIP形式</p></div></section>
+    <section><span>03</span><div><h3>CapCutを開く</h3><a href="https://www.capcut.com/my-edit?from_page=landing_page&start_tab=video" target="_blank" rel="noopener noreferrer">CapCutを開く <span aria-hidden="true">↗</span></a></div></section>
   </div>;
 }
 
 function AnalysisSheetAction({ url, busy, error, onCreate }: { url: string; busy: boolean; error: string; onCreate: () => Promise<void> }) {
+  if (process.env.NEXT_PUBLIC_REVIEW_MODE === "true") return <div className="analysis-sheet-action"><p>確認用環境ではGoogleスプレッドシート連携を停止しています。本番のシートは変更されません。</p><button className="video-button" disabled>確認用では利用できません</button></div>;
   return <div className="analysis-sheet-action">{url ? <a className="video-button" href={url} target="_blank" rel="noopener noreferrer">▦　記入用スプレッドシートを開く</a> : <button type="button" className="video-button" onClick={() => void onCreate()} disabled={busy}>{busy ? "スプレッドシートを準備しています…" : "▦　記入用スプレッドシートを開く"}</button>}{error && <p className="form-error" role="alert">{error}</p>}</div>;
 }
 
@@ -334,10 +298,10 @@ function CardList({ items, type }: { items: string[]; type: string }) {
 function Compare({ ok, ng }: { ok:string[]; ng:string[] }) { return <div className="compare"><section className="ok"><h3><span>OK</span> この場合は対象</h3>{ok.map(x=><p key={x}>✓　{x}</p>)}</section><section className="ng"><h3><span>NG</span> この場合は対象外</h3>{ng.map(x=><p key={x}>×　{x}</p>)}</section></div> }
 function Decision({ steps, hint }: { steps:string[]; hint:string }) { return <><div className="decision">{steps.map((s,i)=><div className="decision-row" key={s}><div className="question"><small>確認 {i+1}</small><strong>{s}</strong></div><div className="answer yes"><b>YES</b><span>{i === steps.length-1 ? "記入・次の作業へ" : "次の確認へ ↓"}</span></div><div className="answer no"><b>NO</b><span>対象外・見直す</span></div></div>)}</div><div className="decision-result">判断のしかた：{hint}</div></> }
 function Placeholder({ label }: { label:string }) { return <div className="placeholder"><div>▧</div><strong>ここに説明画像を入れる</strong><span>{label}</span></div> }
-function Checklist({ items, prefix, offset=0, saved, update }: { items:string[]; prefix:string; offset?:number; saved:SavedState; update:(k:string,v:boolean)=>void }) { return <div className="checklist">{items.map((x,i)=>{const key=`${prefix}-${i+offset}`; return <label key={key} className={saved.checks[key] ? "checked" : ""}><input type="checkbox" checked={!!saved.checks[key]} onChange={e=>update(key,e.target.checked)} /><span className="fake-check">✓</span><strong>{x}</strong></label>})}</div> }
+function Checklist({ items, prefix, offset=0, saved, update }: { items:string[]; prefix:string; offset?:number; saved:SavedState; update:(k:string,v:boolean)=>void }) { const drive=useContext(DriveContext); return <div className="checklist">{items.map((x,i)=>{const key=`${prefix}-${i+offset}`; return <label key={key} className={saved.checks[key] ? "checked" : ""}><input type="checkbox" checked={!!saved.checks[key]} disabled={key==="4-5-4" && (!drive.ready || drive.busy || (!drive.folderUrl && !saved.checks[key]))} onChange={e=>update(key,e.target.checked)} /><span className="fake-check">✓</span><strong>{x}</strong></label>})}</div> }
 
 function Celebration({ completed=[], onHome }: { completed?:number[]; onHome:()=>void }) {
   const levels = STEPS.map(s => s.outcome);
   const allDone = completed.length === TOTAL_STEPS;
-  return <main className="celebration"><header className="topbar"><button className="brand-button" onClick={onHome}><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></button></header><section className="celebrate-hero"><div className="seal">✓</div><p className="eyebrow">{allDone ? "ALL QUESTS COMPLETE" : "STEP COMPLETE"}</p><h1>{allDone ? "すべてのSTEPをクリア" : "STEP4 完了"}</h1><p>{allDone ? "4つの基本スキルが身につきました。ここまで進めた経験が、SNSのお仕事を一人で進める力になります。" : "STEP4を完了しました。トップへ戻って、ほかのSTEPも確認しましょう。"}</p></section><section className="level-list">{levels.map((x,i)=>{const done=completed.includes(i+1); return <div key={x} className={done?"cleared":""}><span>LEVEL {i+1}</span><strong>{x}</strong><em>{done?"✓ CLEAR":"未完了"}</em></div>})}</section><div className="celebrate-actions"><button className="secondary-button" onClick={onHome}>トップへ戻る</button></div></main>
+  return <main className="celebration"><header className="topbar"><button className="brand-button" onClick={onHome}><span className="brand-mark">S</span><span>SNSお仕事マニュアル</span></button></header><section className="celebrate-hero"><div className="seal">✓</div><p className="eyebrow">{allDone ? "ALL QUESTS COMPLETE" : "STEP COMPLETE"}</p><h1>{allDone ? "すべてのSTEPをクリア" : "STEP6 完了"}</h1><p>{allDone ? "6つのSTEPをやり遂げました。ここまで進めた経験が、SNSのお仕事を一人で進める力になります。" : "STEP6を完了しました。トップへ戻って、ほかのSTEPも確認しましょう。"}</p></section><section className="level-list">{levels.map((x,i)=>{const done=completed.includes(i+1); return <div key={x} className={done?"cleared":""}><span>LEVEL {i+1}</span><strong>{x}</strong><em>{done?"✓ CLEAR":"未完了"}</em></div>})}</section><div className="celebrate-actions"><button className="secondary-button" onClick={onHome}>トップへ戻る</button></div></main>
 }

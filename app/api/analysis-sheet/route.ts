@@ -1,3 +1,4 @@
+import { isReview } from "../../review-config";
 import { env } from "cloudflare:workers";
 import { jsonError, requireUser } from "../../server-auth";
 
@@ -17,6 +18,7 @@ function diagnosticError(code: string, detail: string) {
 export async function POST() {
   try {
     const user = await requireUser();
+    if (isReview()) return Response.json({ error: "確認用環境ではGoogleスプレッドシート連携を停止しています", code: "REVIEW_DISABLED" }, { status: 403 });
     const runtime = env as unknown as RuntimeEnv;
     const webAppUrl = runtime.ANALYSIS_SHEET_WEB_APP_URL?.trim();
     const apiSecret = runtime.ANALYSIS_SHEET_API_SECRET?.trim();

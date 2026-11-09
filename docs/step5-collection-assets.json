@@ -1,0 +1,485 @@
+[
+  {
+    "id": 1,
+    "title": "フルーツ雑学",
+    "slug": "fruit",
+    "durationSeconds": 28.0,
+    "images": [
+      {
+        "originalName": "雑学バナナ.png",
+        "bytes": 2071384,
+        "sha256": "1d101dd7737b2ada482afba66ebf9136a1ee3d45f19d27ec28bdbbfebd908af6"
+      },
+      {
+        "originalName": "雑学パイン.png",
+        "bytes": 2555816,
+        "sha256": "1811d018799a4ca6f1f286fad955a1b228104bd7a3759824385450b6063481fb"
+      },
+      {
+        "originalName": "雑学南国.png",
+        "bytes": 2517493,
+        "sha256": "5f0d72622045683cd1bd18c7adb0a8f648cccb5e5d6a0b07c9cc9bf21cbf919b"
+      },
+      {
+        "originalName": "雑学空.png",
+        "bytes": 2375160,
+        "sha256": "d44df0555379f94bd3ae3158ba6f604e34dcec21b8633417c89a673a78f6e193"
+      },
+      {
+        "originalName": "雑学苺.png",
+        "bytes": 2286910,
+        "sha256": "7ac005010407f86d0fd391ff031e2a260b40682d3a35c1738334d1e05bd6ccae"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/fruit/editing-images.zip",
+      "sha256": "473d299b037222512fa96265c54eb29c1d5f2d3f55c0f29e5593ae1568d38659"
+    },
+    "referenceOriginal": {
+      "originalName": "フルーツ雑学見本動画.mov",
+      "file": "public/step5/fruit/reference-original.mov",
+      "sha256": "c724caf0c153a57d3fced8d3447b5be41999217e5f0e3194c21c5ec41127c8d6"
+    },
+    "referencePlayback": {
+      "file": "public/step5/fruit/reference.mp4",
+      "sha256": "5516ca0c4174f4c2c9dfbfc3a5f48eefb7a370a6211e6d2f1127f2bab2c58f0f",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 2,
+    "title": "お菓子の家",
+    "slug": "sweets-house",
+    "durationSeconds": 30.0,
+    "images": [
+      {
+        "originalName": "お菓子の家①.png",
+        "bytes": 2523265,
+        "sha256": "cb4c3e94739e788b56c4a14c263a4dc61467f69960524f7b4faf9fd1b35b72e0"
+      },
+      {
+        "originalName": "お菓子の家②.png",
+        "bytes": 2914590,
+        "sha256": "d48f6c82b46ff9d0df9c3f7815097a7f1afe966ae3874bb21c7863c60b10c706"
+      },
+      {
+        "originalName": "お菓子の家③.png",
+        "bytes": 2823713,
+        "sha256": "d10ec7070ef6455f9c1de4ad703e7d6d1916170e45f841b2a0c505821bfe877a"
+      },
+      {
+        "originalName": "お菓子の家④.png",
+        "bytes": 2756961,
+        "sha256": "c7fd9711e88e9b9d5499bdf2c6d008784a33c1c48bbd6179ef6487d987dfd74b"
+      },
+      {
+        "originalName": "お菓子の家⑤.png",
+        "bytes": 2738368,
+        "sha256": "dcadfebb5e25530d2e3c98c565b3e89957f1aad5ace67ff9fa8dce6259234c39"
+      },
+      {
+        "originalName": "お菓子の家⑥.png",
+        "bytes": 2865415,
+        "sha256": "0be5c95d01f5c0556a3d0323842d5e03a82779c575b8cd263cd34582d0f1fdbe"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/sweets-house/editing-images.zip",
+      "sha256": "e879aba70f725a3ffd710ba43d3aa60342d7fdd7dff33516485d8473d392cc43"
+    },
+    "referenceOriginal": {
+      "originalName": "お菓子の家見本動画.mov",
+      "file": "public/step5/sweets-house/reference-original.mov",
+      "sha256": "cdb0d6f54418f45b2221c0752cf4c5a7cdd9c20ca31a3e9835b4c6c9ecaa0396"
+    },
+    "referencePlayback": {
+      "file": "public/step5/sweets-house/reference.mp4",
+      "sha256": "f66caf8f752b861227766d33790d74167307750a8d5313bccc308a6bdf4b6acb",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 3,
+    "title": "クイズ",
+    "slug": "quiz",
+    "durationSeconds": 24.98,
+    "images": [
+      {
+        "originalName": "クイズ１.png",
+        "bytes": 2002813,
+        "sha256": "f9f1a819e9c14c23463935bd39d99c43177dc1580ffa7054134f5d06b1463699"
+      },
+      {
+        "originalName": "クイズシルエットドラゴンフルーツ.png",
+        "bytes": 1282599,
+        "sha256": "db25f33efd5f3b7a2aec901eed8a5a2d145e66cdd83872648f76940d1f2dbb13"
+      },
+      {
+        "originalName": "クイズシルエットブロッコリー.png",
+        "bytes": 1299914,
+        "sha256": "0412d725bca4b6e5f651dce3ae52882ed2c14b038c22d6bcf0bdfe50fbc7f7b8"
+      },
+      {
+        "originalName": "クイズシルエットリンゴ.png",
+        "bytes": 1298910,
+        "sha256": "b9aa09f2a666124936d04edb190e1328104d51fc0ed5b00d7d7f91eda9d3d5c8"
+      },
+      {
+        "originalName": "クイズ正解りんご.png",
+        "bytes": 1805791,
+        "sha256": "ce73f21e13633d66f6c55f904c68f18a0c6d8dcca4124d321844664f07dd7778"
+      },
+      {
+        "originalName": "クイズ正解ドラゴンフルーツ.png",
+        "bytes": 1752153,
+        "sha256": "9dbd24e6071410520f5249a7d2ccc7ac001b6dd90a6d1572ef5fc189b5f03525"
+      },
+      {
+        "originalName": "クイズ正解ブロッコリー.png",
+        "bytes": 1871839,
+        "sha256": "064de432fe18a793fe04c0a3e681b305d548b2631d1d73b6783fc7994f55903f"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/quiz/editing-images.zip",
+      "sha256": "a4e8cc291acf7ae8bb3faa37fb517f5ce76d42309e027974bbebefa336b3053b"
+    },
+    "referenceOriginal": {
+      "originalName": "クイズ見本動画.mov",
+      "file": "public/step5/quiz/reference-original.mov",
+      "sha256": "09a6fc6fe58e58990d3713403ff9a6d252527df261738fc1d59bc072bb949dce"
+    },
+    "referencePlayback": {
+      "file": "public/step5/quiz/reference.mp4",
+      "sha256": "6de963f8d0c7d3b7cf41313e10fe3a934ca563f8b9c8f58d0294e46c7954a2cd",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 4,
+    "title": "宇宙",
+    "slug": "space",
+    "durationSeconds": 29.0,
+    "images": [
+      {
+        "originalName": "宇宙①-2.png",
+        "bytes": 2962598,
+        "sha256": "beb2d286145953ba08049ec1f85e600249b517ed5e748300a56869f816a8f140"
+      },
+      {
+        "originalName": "宇宙①.png",
+        "bytes": 3229934,
+        "sha256": "55e6777d03e0c94d81c3631be34879ed59036ddddc9c2cf9058b0643f38d7790"
+      },
+      {
+        "originalName": "宇宙②.png",
+        "bytes": 3110738,
+        "sha256": "0e5787cece48ee2cbda6ba460cdffa77a6136f3525d0ee0654164ae0149bb7db"
+      },
+      {
+        "originalName": "宇宙③.png",
+        "bytes": 2652932,
+        "sha256": "4cfdc8a621c7bf1d4452bf771232a4a4bc8733ac8c3b3d2defec482550bec726"
+      },
+      {
+        "originalName": "宇宙④.png",
+        "bytes": 2762653,
+        "sha256": "e5709233f82d33ee68fcaa56acf64f6fcbe938bffe7f91b7a0a63c79961a7af8"
+      },
+      {
+        "originalName": "宇宙⑤-2.png",
+        "bytes": 2888605,
+        "sha256": "6c846c1d075ed4f50676aff7c8d924e3a2e517204437cd67975d213565ee342a"
+      },
+      {
+        "originalName": "宇宙⑤.png",
+        "bytes": 2812239,
+        "sha256": "7c345f2d2b64b52d8c7e8ccf8f750d276d382b148e784fc3645ca8d545e5e703"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/space/editing-images.zip",
+      "sha256": "abaa2c3c2e558de494b258c9af120453bd41d5039108281a972136ccdc115fba"
+    },
+    "referenceOriginal": {
+      "originalName": "宇宙見本動画.mov",
+      "file": "public/step5/space/reference-original.mov",
+      "sha256": "752eafdb0a3068ffb9f205f5c47f8feb0dbaf9f9a14dd62b1293dd767fdbe98f"
+    },
+    "referencePlayback": {
+      "file": "public/step5/space/reference.mp4",
+      "sha256": "3d4e5e82754ecd9dc517c59e3e3270450c31fb2bf87f1ab0b5b23c11b23bad3f",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 5,
+    "title": "100年後",
+    "slug": "future",
+    "durationSeconds": 30.0,
+    "images": [
+      {
+        "originalName": "１００年後①.png",
+        "bytes": 2700979,
+        "sha256": "1d721360f87331126bc846ad18dab6ffa723dd52fc848269b94b362ab58b5e68"
+      },
+      {
+        "originalName": "１００年後②.png",
+        "bytes": 3048662,
+        "sha256": "c3fb24f68bf3d88ca84a7c84673c19ce5eef41c5a1d9e3908fb12fc597c51bd0"
+      },
+      {
+        "originalName": "１００年後③.png",
+        "bytes": 2551534,
+        "sha256": "556111052fa20f99c8d383373845d59239fa2ac53340e7e1ce6ac118740fa5bd"
+      },
+      {
+        "originalName": "１００年後④.png",
+        "bytes": 2349045,
+        "sha256": "53e076a29275c189b0ce43ca4a7d212ccc5c790c0e11b6143e43f17ecb0d1643"
+      },
+      {
+        "originalName": "１００年後⑤.png",
+        "bytes": 2556098,
+        "sha256": "eaab415c5d57ae4f8d91b1d52a8d748624108ec469ce5153200251903b45c99d"
+      },
+      {
+        "originalName": "１００年後⑥.png",
+        "bytes": 3223436,
+        "sha256": "5cb14048d02afa6d09ea5a3a45ac1bcf743fb1a89cc8803fbfe0897d85df7175"
+      },
+      {
+        "originalName": "１００年後⑦.png",
+        "bytes": 2631191,
+        "sha256": "42609e7081ec8de0edfcefdfd8b9371b5ef8f565f7d7930f797418e3996bfd3a"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/future/editing-images.zip",
+      "sha256": "086b49d0e0938e065d23d6530f49da7a6910c02870e94146634bc6dddc6882e9"
+    },
+    "referenceOriginal": {
+      "originalName": "100年後見本動画.mov",
+      "file": "public/step5/future/reference-original.mov",
+      "sha256": "35aadccefd4ad00ab885d7a57ea94e72d59708b55b945ac5a01836b223db4782"
+    },
+    "referencePlayback": {
+      "file": "public/step5/future/reference.mp4",
+      "sha256": "e0a2fd3d0cbd7e7ac286e8ac605e87e05fa62bd2f6488197cf47139e52bd7277",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 6,
+    "title": "片付け",
+    "slug": "tidying",
+    "durationSeconds": 30.0,
+    "images": [
+      {
+        "originalName": "片付け①.png",
+        "bytes": 2167090,
+        "sha256": "6a3e48ba0475bb5104150dd15ab163a3b7f23db23e45bf076e22a20cf0086b65"
+      },
+      {
+        "originalName": "片付け②-1.png",
+        "bytes": 2214692,
+        "sha256": "9279018bbb423a868ad9f03f5608dd95115e356d7a1c3f36cc9e195158be679d"
+      },
+      {
+        "originalName": "片付け②.png",
+        "bytes": 2383972,
+        "sha256": "abaf01ba29acb3b493213959ed7e300fca7623324b99ee0df5d50cc7e46d1dc4"
+      },
+      {
+        "originalName": "片付け③-1.png",
+        "bytes": 2108978,
+        "sha256": "35fce9d5d067661ab6b4e5f9b40c90b79a8dc6689c14a9fa300ac0155cb509c6"
+      },
+      {
+        "originalName": "片付け③.png",
+        "bytes": 2277453,
+        "sha256": "ea813f6bc7e9f316f8dbfbddbc50ae96852e13d7b7623ce608abcd50bc7bbf7f"
+      },
+      {
+        "originalName": "片付け④-1.png",
+        "bytes": 2385907,
+        "sha256": "9cd917aace25779edce0a5644a27a31fec085d126eec80baf4217647563344de"
+      },
+      {
+        "originalName": "片付け④.png",
+        "bytes": 2280805,
+        "sha256": "c59fae300bfb1330874f1d849df430e128af17e6ce1a973d9948f1d5a85ee5ca"
+      },
+      {
+        "originalName": "片付け⑤.png",
+        "bytes": 2193797,
+        "sha256": "f3f763edc0e1cae0d44d916a4a6accd29be118c96ee6c70c1c46d3013583155f"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/tidying/editing-images.zip",
+      "sha256": "2d0e078c265acf896c4a1f164182b1e1b530b87e7f3c6b8aacae239a0e4f251b"
+    },
+    "referenceOriginal": {
+      "originalName": "片付け見本動画.mov",
+      "file": "public/step5/tidying/reference-original.mov",
+      "sha256": "16f74d86a7499cf384b593712416085cecbe7b1f71f8ea2e9cf70e7f6157c6b6"
+    },
+    "referencePlayback": {
+      "file": "public/step5/tidying/reference.mp4",
+      "sha256": "d8d9c94010508107dc890214f2412c05dca7f4ab38e8433753a6335a2cb94735",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 7,
+    "title": "四季",
+    "slug": "seasons",
+    "durationSeconds": 30.0,
+    "images": [
+      {
+        "originalName": "四季①.png",
+        "bytes": 2575126,
+        "sha256": "56963205645d1f07f4d2bfd4d56cce8a8511163b408a51d9c34aff603f99e57d"
+      },
+      {
+        "originalName": "四季②.png",
+        "bytes": 3060776,
+        "sha256": "558e25209965934e121de8bc319aa4d87a28dace92c9638ff7d6cfb685ca9d90"
+      },
+      {
+        "originalName": "四季③.png",
+        "bytes": 3038524,
+        "sha256": "38838410bca88aeb68c3d5949de4107f5e1d1fe3463423b83daa4d4d8db9c57e"
+      },
+      {
+        "originalName": "四季④.png",
+        "bytes": 3074531,
+        "sha256": "e100ebe8d830d46f5dfb0a991b1605add90bc6406a248651b97736aa2af37b08"
+      },
+      {
+        "originalName": "四季⑤.png",
+        "bytes": 2821122,
+        "sha256": "9efbcceb0b77a40d9cfce7dd71a51ae103d349bb3331694b974d2d51ba676943"
+      },
+      {
+        "originalName": "四季⑥.png",
+        "bytes": 3186920,
+        "sha256": "506c57d9b8547594ebd44682970006f078a6e118284cfdad347425be8d4a2bbb"
+      },
+      {
+        "originalName": "四季⑦.png",
+        "bytes": 2241385,
+        "sha256": "39b0cbef2026cb934d2ff9f06fdec2ced28230d1c2c3e03f34e84c2134f17d41"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/seasons/editing-images.zip",
+      "sha256": "e68b5525a9cd1259452672bc1ced5eb6d024cd8b9dcffa8582e2c811e3d86da9"
+    },
+    "referenceOriginal": {
+      "originalName": "四季見本動画.mov",
+      "file": "public/step5/seasons/reference-original.mov",
+      "sha256": "ff5322f1653842d53c5b704eb8ed5f36f42a7711246d201e8383f0bcf7bf10ad"
+    },
+    "referencePlayback": {
+      "file": "public/step5/seasons/reference.mp4",
+      "sha256": "fe0e1c147728e4555504c81b80c4be169be71fc994445867488acb32bbe53eca",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 8,
+    "title": "心理テスト",
+    "slug": "psychology",
+    "durationSeconds": 25.98,
+    "images": [
+      {
+        "originalName": "心理テストピンクの扉.png",
+        "bytes": 2583120,
+        "sha256": "56c3154d1970011b8164c9f6243e3fd47165b624d94a84c7e5a61d7f760b6693"
+      },
+      {
+        "originalName": "心理テスト扉.png",
+        "bytes": 2568255,
+        "sha256": "2ee7e24d2d4c9812795d20d24ea41b89d48da3ee8bbfe78d1d8d9047241192d8"
+      },
+      {
+        "originalName": "心理テスト青の扉.png",
+        "bytes": 2735017,
+        "sha256": "03c0254fe2a3234a59e0ef4cbb23a648593f4a91bc799e8fc07b7d0c3034a146"
+      },
+      {
+        "originalName": "心理テスト黄金の扉.png",
+        "bytes": 2554595,
+        "sha256": "64e6bc53ab8bb4459b9c62e2b81cf0130acddb169abc123640494b6f108ce41e"
+      },
+      {
+        "originalName": "心理テス紫の扉.png",
+        "bytes": 2726497,
+        "sha256": "3878840df0d9115fba3e3db1e1ff156c381370c433c43697df050b55a92c1fff"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/psychology/editing-images.zip",
+      "sha256": "4bbd694fc8b4ac7fb3a87595a23da123a2dfab3ac92223aa23d1f41c31e45191"
+    },
+    "referenceOriginal": {
+      "originalName": "心理テスト見本動画.mov",
+      "file": "public/step5/psychology/reference-original.mov",
+      "sha256": "574c93ba3a08bd07de5065259acbc0a323731c454a989a6888b034b621460f4c"
+    },
+    "referencePlayback": {
+      "file": "public/step5/psychology/reference.mp4",
+      "sha256": "c1ecedee1a6a810b86812dddf7d4b5cde5a6928eb1ab7065576fc7cdc62cb23b",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  },
+  {
+    "id": 9,
+    "title": "住みたい",
+    "slug": "dream-home",
+    "durationSeconds": 28.0,
+    "images": [
+      {
+        "originalName": "住みたい①.png",
+        "bytes": 2758240,
+        "sha256": "870839a08bcd9beccc5a7f10a77a1b2019e0db3bc675fb1919cded153734865c"
+      },
+      {
+        "originalName": "住みたいお菓子の家.png",
+        "bytes": 2637645,
+        "sha256": "d2e491fae8d47324e2ce1ab5cabd80083a03111785aca4e31993f809d1127464"
+      },
+      {
+        "originalName": "住みたい森.png",
+        "bytes": 3302092,
+        "sha256": "8260c27fca7df949f99560af78feb92c193524df433550eb9e679c27632ed994"
+      },
+      {
+        "originalName": "住みたい海.png",
+        "bytes": 3004846,
+        "sha256": "6ac4cdf807d74e156a827744742468acd96d41a5aae45318260bfb8f3da9f2ca"
+      },
+      {
+        "originalName": "住みたい空.png",
+        "bytes": 2638748,
+        "sha256": "763c69d199c3b111d4c897038ae876592af02bd8dece4123a39a41c9fe9fb00b"
+      }
+    ],
+    "editingZip": {
+      "file": "public/step5/dream-home/editing-images.zip",
+      "sha256": "52f3e209191d3495ed158d39dee43be28cc8a2ae59117e0b9c8942cbdd163963"
+    },
+    "referenceOriginal": {
+      "originalName": "住みたい見本動画.mov",
+      "file": "public/step5/dream-home/reference-original.mov",
+      "sha256": "a12c529fe2b37e2cf028ff7fe83b75ca267490531e882eab07b81ca84d2db31e"
+    },
+    "referencePlayback": {
+      "file": "public/step5/dream-home/reference.mp4",
+      "sha256": "7c04875fc5896cb279f1c8461dc44fc9898df228d838edcb028401b4b5ac48c4",
+      "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4"
+    }
+  }
+]

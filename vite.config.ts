@@ -1,12 +1,15 @@
 import vinext from "vinext";
 import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
+import reviewHosting from "./.openai/hosting.review.json";
+import { reviewLocalMedia, reviewPublicDirectory } from "./build/review-local-media";
 import { sites } from "./build/sites-vite-plugin";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
 
-const { d1, r2 } = hostingConfig;
+const review = process.env.SNS_MANUAL_PROFILE === "review";
+const { d1, r2 } = review ? reviewHosting : hostingConfig;
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
@@ -27,13 +30,13 @@ const localBindingConfig = {
     ? [
         {
           binding: r2,
-          bucket_name: "site-creator-r2",
+          bucket_name: review ? "review-not-provisioned" : "site-creator-r2",
         },
       ]
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
@@ -43,16 +46,25 @@ export default defineConfig(async () => {
   // Wrangler snapshots its log path while the Cloudflare plugin is imported.
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
+  const bindingConfig = { ...localBindingConfig,
+    // Local review reuses the existing local-only D1 identity; never a remote ID.
+    r2_buckets: review && command === "serve" ? [] : localBindingConfig.r2_buckets,
+    ...(review ? { vars: { REVIEW_MODE: "true" } } : {}),
+  };
   return {
+    publicDir: await reviewPublicDirectory(),
+    ...(review ? { build: { outDir: "dist-review" } } : {}),
+    define: { "process.env.NEXT_PUBLIC_REVIEW_MODE": JSON.stringify(review ? "true" : "false") },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
     plugins: [
+      ...(review ? [reviewLocalMedia()] : []),
       vinext(),
-      sites(),
+      sites({ review }),
       cloudflare({
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-        config: localBindingConfig,
+        config: bindingConfig,
       }),
     ],
   };

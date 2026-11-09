@@ -1,12 +1,18 @@
 import { env } from "cloudflare:workers";
+import { isReview, reviewBindings } from "./review-config";
 import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "sns_manual_session";
+const sessionCookie = () => isReview() ? "sns_manual_review_session" : SESSION_COOKIE;
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 export type SessionUser = { id: string; name: string; role: "user" | "admin" };
 
 export function getD1() {
+  if (isReview()) {
+    if (!reviewBindings().REVIEW_DB) throw new Error("Review database is not configured; refusing production fallback");
+    return reviewBindings().REVIEW_DB!;
+  }
   if (!env.DB) throw new Error("Database binding is unavailable");
   return env.DB;
 }
@@ -49,18 +55,18 @@ export async function createSession(userId: string) {
   const expiresAt = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
   await getD1().prepare("INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)").bind(tokenHash, userId, expiresAt).run();
   const jar = await cookies();
-  jar.set(SESSION_COOKIE, token, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: SESSION_TTL_SECONDS });
+  jar.set(sessionCookie(), token, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: SESSION_TTL_SECONDS });
 }
 
 export async function clearSession() {
   const jar = await cookies();
-  const token = jar.get(SESSION_COOKIE)?.value;
+  const token = jar.get(sessionCookie())?.value;
   if (token) await getD1().prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await hashToken(token)).run();
-  jar.set(SESSION_COOKIE, "", { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 0 });
+  jar.set(sessionCookie(), "", { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 0 });
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const token = (await cookies()).get(sessionCookie())?.value;
   if (!token) return null;
   const now = Math.floor(Date.now() / 1000);
   const row = await getD1().prepare(`SELECT u.id, u.name, u.role FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ? AND s.expires_at > ? AND u.active = 1`).bind(await hashToken(token), now).first<SessionUser>();

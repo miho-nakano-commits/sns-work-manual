@@ -77,3 +77,57 @@ body{background:#eaf8fb;color:var(--ink);font-family:"M PLUS Rounded 1c","Hiragi
 .reference-video{margin-top:28px}.reference-video video{display:block;width:min(100%,430px);max-height:72vh;margin:0 auto;border:5px solid white;border-radius:22px;background:#14212b;box-shadow:0 8px 0 #d19455,0 20px 38px rgba(75,52,31,.18)}.reference-video p{margin:24px auto 0;color:#637083;font-size:13px;font-weight:750;text-align:center}
 .editing-resources{display:flex;flex-direction:column;gap:17px;margin-top:30px}.editing-resources section{display:grid;grid-template-columns:52px minmax(0,1fr);gap:17px;padding:22px;border:4px solid white;border-radius:19px;background:linear-gradient(135deg,#fff,var(--soft));box-shadow:0 6px 0 color-mix(in srgb,var(--card) 32%,#bbcdd1)}.editing-resources section>span{display:grid;width:48px;height:48px;place-items:center;border:3px solid white;border-radius:14px;background:var(--card);box-shadow:0 3px 0 color-mix(in srgb,var(--card) 70%,#44565e);color:white;font-weight:950}.editing-resources h3{margin:3px 0 15px;color:#24445a;font-size:18px}.editing-resources a,.editing-resources button{display:flex;width:100%;min-height:54px;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border:3px solid white;border-radius:13px;background:linear-gradient(#8c73d6,#6852ae);box-shadow:0 5px 0 #49377e;color:white;font:inherit;font-size:14px;font-weight:900;text-align:center;text-decoration:none;cursor:pointer}.editing-resources a:hover{filter:brightness(1.06)}.editing-resources button:disabled{background:#aebdc3;box-shadow:0 5px 0 #829298;cursor:not-allowed}.editing-resources p{margin:10px 0 0;color:#6f7d88;font-size:12px;font-weight:750;text-align:center}
 @media(max-width:640px){.reference-video video{width:100%;border-radius:17px}.editing-resources section{grid-template-columns:42px minmax(0,1fr);gap:12px;padding:16px 13px}.editing-resources section>span{width:40px;height:40px;border-radius:11px;font-size:13px}.editing-resources h3{font-size:16px}.editing-resources a,.editing-resources button{font-size:13px}}
+
+/* Five-step course and self-reported video submissions. */
+.step-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.practice-progress{margin:24px 0;padding:22px;border:3px solid #fff;border-radius:18px;background:#fff5dc;box-shadow:0 5px 0 #e5c87b}
+.practice-progress p{margin:0 0 12px;text-align:center;font-size:20px;font-weight:800}
+.practice-progress strong{color:#8c3b67;font-size:27px}
+.practice-progress .progress-track{height:16px;background:#e7dbe5}
+.practice-progress .progress-track span{background:linear-gradient(90deg,#a357b0,#df7694)}
+.practice-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:30px}
+.practice-item{padding:20px;border:3px solid white;border-radius:18px;background:#fff;box-shadow:0 5px 0 #d5c4df}
+.practice-item>div{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.practice-item h3{margin:0;font-size:22px}.practice-status{font-size:14px;font-weight:800;color:#637083}
+.practice-item.submitted{background:#eaf8ed;box-shadow:0 5px 0 #a5d3b2}.practice-item.submitted .practice-status{color:#17623f}
+.practice-item label{display:flex;align-items:center;gap:12px;min-height:56px;margin-top:14px;padding:8px;border:2px solid #d4c8df;border-radius:12px;cursor:pointer;font-weight:800}
+.practice-item input{width:26px;height:26px;flex-shrink:0;accent-color:#397d57;cursor:pointer}
+.practice-note{margin-top:25px;color:#526172;font-weight:700;line-height:1.9}
+.editing-resources .material-pending{padding:12px;border:2px dashed #b29ac7;border-radius:12px;background:#f6f1fa;color:#604976;font-size:16px}
+.practice-clear{margin-top:28px;padding:30px 24px;border:4px solid #fff;border-radius:24px;background:linear-gradient(145deg,#fff6cd,#ffe9f2);box-shadow:0 7px 0 #d6b3c5;text-align:center}
+.practice-medal{display:grid;place-items:center;width:85px;height:85px;margin:0 auto 18px;border:5px solid #fff;border-radius:50%;background:#f5ce54;color:#76540e;font-size:50px;box-shadow:0 5px 0 #dbad35}
+.practice-clear h3{font-size:clamp(22px,3vw,30px);line-height:1.65;color:#663a65}.practice-clear>p{font-weight:750}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #1b65aa;outline-offset:4px}
+@media(max-width:1000px){.step-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.step-grid,.practice-list{grid-template-columns:1fr}.practice-clear{padding:24px 16px}.practice-progress{padding:18px 12px}.practice-progress p{font-size:17px}.practice-progress strong{font-size:25px}.account-actions .save-state{display:inline;font-size:10px}.account-actions{flex-wrap:wrap;justify-content:flex-end}.progress-table{min-width:870px}}
+@media(max-width:640px){.home-nav,.topbar{height:auto;min-height:76px;flex-wrap:wrap;gap:10px;padding:12px 18px}.account-actions{width:100%;justify-content:flex-end}.account-actions .text-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;font-size:12px}.account-actions .save-state{font-size:11px}.hero-copy h1{font-size:32px}}
+.lesson h2,.practice-clear h3{text-wrap:balance}
+.practice-single .practice-video-heading{margin:28px 0 12px;font-size:clamp(24px,3vw,30px);color:#743c65}.practice-single h4{margin:0 0 14px;font-size:20px;color:#24445a}.practice-single .practice-item{margin-top:24px}.practice-single .practice-item h4{margin:0}.practice-single .editing-resources a+a{margin-top:14px}.practice-single .reference-video{margin-top:12px}.practice-single .reference-video a{margin-top:20px}.practice-navigation{gap:16px}.practice-single .practice-item label{align-items:flex-start}.practice-single .practice-item input{margin-top:4px}.practice-single .practice-status{white-space:nowrap}
+@media(max-width:640px){.practice-single h4{font-size:18px}.practice-navigation{display:flex;flex-direction:column}.practice-navigation button{width:100%;min-height:52px}.practice-single .practice-item{padding:16px}.practice-single .practice-item label{font-size:16px}}
+.editing-resources .practice-asset-note{margin:0 0 18px;text-align:left;font-size:15px;line-height:1.85;color:#40556a}
+.practice-cheer{padding:18px 22px;margin:20px 0;border-radius:18px;background:#fff0c9;color:#655022;line-height:1.8;font-weight:700;border:2px solid #ead695}
+.review-banner{padding:10px 18px;text-align:center;background:#fff0c9;color:#655022;font-size:15px;line-height:1.6;font-weight:700}
+.practice-operation,.legacy-practice{padding:22px;margin:22px 0;border-radius:20px;background:#f0faf6;border:2px solid #bee0d0;line-height:1.9}
+.practice-operation li{margin:12px 0}.legacy-practice summary{cursor:pointer;font-weight:700}.legacy-practice label{display:flex;gap:12px;align-items:center;margin:14px 0}.legacy-practice input{width:24px;height:24px;flex-shrink:0}.legacy-practice button{margin-top:15px}
+/* Manual Google Drive saving: links and controls remain readable on phones. */
+.drive-panel { margin: 1.25rem 0; padding: 1.25rem; border: 2px solid #b7dfd9; border-radius: 20px; background: #f0fbf8; overflow-wrap: anywhere; }
+.drive-panel ol { padding-left: 1.5em; }
+.drive-panel li, .drive-panel p { margin: .65rem 0; }
+.drive-panel .primary-button { display: inline-flex; text-align: center; max-width: 100%; }
+.drive-admin-form { display: grid; gap: 1rem; }
+.drive-admin-form label { display: grid; gap: .5rem; }
+.drive-admin-form input, .drive-admin-form select { width: 100%; min-height: 48px; padding: .75rem; border: 1px solid #accbd5; border-radius: 10px; font: inherit; }
+
+/* Staff review uses local display state only; it has no completion controls. */
+.staff-review-page{min-height:100vh;background:linear-gradient(180deg,#e0f7ff,#fff9dc);color:#174d68}
+.staff-review-wrap{width:min(960px,calc(100% - 32px));margin:32px auto;padding-bottom:48px}
+.staff-review-wrap h1{font-size:clamp(24px,4vw,36px)}
+.staff-review-notice{padding:20px;border:2px solid #b7dfd9;border-radius:18px;background:#f0fbf8;font-size:18px;line-height:1.8}
+.staff-review-steps,.staff-review-videos{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}
+.staff-review-videos button{min-height:48px;padding:12px 16px;border:2px solid #b7dfd9;border-radius:14px;background:white;color:#174d68;font:inherit;font-weight:700;cursor:pointer}
+.staff-review-videos button[aria-current="true"]{background:#fff0b9;border-color:#b08c39}
+.staff-review-page button:disabled{opacity:.55;cursor:not-allowed}
+.staff-review-page .practice-single{padding:24px;border-radius:24px;background:#fffdfa}
+.staff-review-entry{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;padding:16px;background:#f0fbf8;color:#174d68}
+.staff-review-page :focus-visible{outline:3px solid #8054b5;outline-offset:4px}
+@media(max-width:640px){.staff-review-wrap{width:calc(100% - 24px);margin-top:20px}.staff-review-videos button{width:100%;text-align:left}.staff-review-steps button{flex:1;min-height:52px}.staff-review-page .practice-single{padding:16px}.staff-review-notice{font-size:16px}}

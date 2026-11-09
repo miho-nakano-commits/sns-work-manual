@@ -12,7 +12,9 @@
     "test": "node --import ./tests/register-loader.mjs --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
-    "typecheck": "node scripts/check-types.mjs"
+    "typecheck": "node scripts/check-types.mjs",
+    "dev:review": "node scripts/run-review.mjs dev",
+    "build:review": "node scripts/run-review.mjs build"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

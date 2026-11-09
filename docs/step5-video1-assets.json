@@ -1,0 +1,45 @@
+{
+  "images": [
+    {
+      "originalName": "癒やし子うさぎ.png",
+      "file": "public/step5/video-01/rabbit.png",
+      "bytes": 1953004,
+      "sha256": "42d2e2505c7641abf516419aa8e9aa4c27314d0f1184bbc969692d3f504b51cc"
+    },
+    {
+      "originalName": "癒やし子犬.png",
+      "file": "public/step5/video-01/puppy.png",
+      "bytes": 1889140,
+      "sha256": "08aa7859d66bfe8dc7d358bc0b599359183865b4e11724e49b1fb7c783d9e9bd"
+    },
+    {
+      "originalName": "癒やし子猫.png",
+      "file": "public/step5/video-01/kitten.png",
+      "bytes": 1937255,
+      "sha256": "8f0051a17035b2992a7144582b04eab9e0a690ed76b2c9494115e6e70edc1603"
+    },
+    {
+      "originalName": "癒やし子猫２.png",
+      "file": "public/step5/video-01/kitten-closeup.png",
+      "bytes": 2111118,
+      "sha256": "363fe27a6c8b57f112b31d712574b6306c31cc63f33651986756111748d51a94"
+    },
+    {
+      "originalName": "癒やし子猫と子犬png.png",
+      "file": "public/step5/video-01/kitten-and-puppy.png",
+      "bytes": 2031527,
+      "sha256": "412d8b80fc3f541d86731f4654e7fddae338fffa6654ba823ceabcc5add2202d"
+    }
+  ],
+  "referenceOriginal": {
+    "originalName": "癒し.mov",
+    "file": "public/step5/video-01/reference-original.mov",
+    "bytes": 11979317,
+    "sha256": "b1c3e36ddd52a6e302514a598d2a416a872ad5c818d2b818709a9483a0453ac7"
+  },
+  "referencePlayback": {
+    "file": "public/step5/video-01/reference.mp4",
+    "conversion": "H.264/AAC streams copied without re-encoding; faststart MP4",
+    "sha256": "09199e861290b6ba0ed2052537f28898ee6d48950cb557b67bf040c7556569cf"
+  }
+}
