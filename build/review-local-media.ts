@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { Readable } from "node:stream";
 import type { Plugin } from "vite";
 import { mediaError, serveMedia, type MediaStore } from "../app/media-response";
+import { ZOOM_GUIDE_ASSET } from "../app/media-catalog";
 
 export async function reviewPublicDirectory() {
   const directory = resolve("work/review-public");
@@ -15,12 +16,13 @@ export async function reviewPublicDirectory() {
 // Development-only substitute for private R2. Reads the originals without copying
 // media, creating a bucket or uploading anything. Auth uses the real local API.
 export function reviewLocalMedia(): Plugin {
+  const localFile = (key: string) => key === ZOOM_GUIDE_ASSET.path.slice(1) ? resolve("work/local-media/zoom-operation.mp4") : resolve("public", key);
   const store: MediaStore = {
     async head(key) {
-      try { const info = await stat(resolve("public", key)); return { size: info.size, etag: `${info.size}-${info.mtimeMs}` }; } catch { return null; }
+      try { const info = await stat(localFile(key)); return { size: info.size, etag: `${info.size}-${info.mtimeMs}` }; } catch { return null; }
     },
     async read(key, offset, length) {
-      return Readable.toWeb(createReadStream(resolve("public", key), { start: offset, end: offset + length - 1 })) as ReadableStream<Uint8Array>;
+      return Readable.toWeb(createReadStream(localFile(key), { start: offset, end: offset + length - 1 })) as ReadableStream<Uint8Array>;
     },
   };
   return { name: "review-local-private-media", apply: "serve", configureServer(server) {

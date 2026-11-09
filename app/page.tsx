@@ -6,7 +6,7 @@ import { mediaUrl } from "./media-catalog";
 import { STEPS, type Screen, type StepData } from "./curriculum";
 import { TOTAL_STEPS, STEP5_VIDEO_COUNT, STEP6_VIDEO_COUNT, practiceCompletedCount, STEP3_CHECK_PREFIX, initialState, normalizeProgress, changeCheck, markStepIncomplete, type SavedState } from "./progress";
 import { StepFiveContent } from "./step-five";
-import { prepareStepFive, selectPracticeVideo } from "./step-five-progress";
+import { currentPracticeVideo, prepareStepFive, selectPracticeVideo } from "./step-five-progress";
 import { practiceIds } from "./practice-catalog";
 import { Encouragement } from "./step-five";
 import { restoreDraft, useProgressSave, type ProgressBaseline } from "./use-progress-save";
@@ -14,6 +14,7 @@ import { driveProgressView } from "./drive-model";
 import { DriveContext, DrivePanel, useDriveSave } from "./drive-ui";
 import { DriveFolderAdmin } from "./drive-admin";
 import { StaffReviewLink } from "./staff-review-link";
+import { ZoomGuideCard, ZoomGuideEntry } from "./zoom-guide";
 
 type SessionUser = { id: string; name: string; role: "user" | "admin" };
 type AdminProgress = { id: string; name: string; progressRate: number; currentStep: number; completedCount: number; lastWorkedStep: number; updatedAt: string | null; step5CompletedCount: number; step6CompletedCount: number; legacySubmissionCount: number; driveStep4Saved: boolean; driveStep5Count: number; driveStep6Count: number; driveProgressRate: number; driveCompletedCount: number; oldCompleted: number[]; driveUpdatedAt: string | null };
@@ -172,6 +173,7 @@ export default function Home() {
           <p className="section-kicker">{screen.type === "checklist" ? "最後の確認" : `LESSON ${String(page + 1).padStart(2, "0")}`}</p>
           <h2>{screen.type === "intro" && stepId < 5 ? step.title : screen.title}</h2>
           <ScreenContent key={`${stepId}-${page}`} screen={screen} step={step} saved={displaySaved} legacySaved={saved} screenKey={screenKey} updateCheck={updateCheck} analysisSheetUrl={saved.form[ANALYSIS_SHEET_URL_KEY] || ""} analysisSheetBusy={analysisSheetBusy} analysisSheetError={analysisSheetError} createAnalysisSheet={createAnalysisSheet} onSelectVideo={selectVideo} onExplanation={() => stepFivePage(0)} onShowClear={() => stepFivePage(2)} />
+          {((stepId === 5 && (screen.type === "practiceComplete" || (screen.type === "practiceVideo" && currentPracticeVideo(displaySaved, 5) === STEP5_VIDEO_COUNT - 1))) || (stepId === 6 && page === 0)) && <ZoomGuideEntry />}
           {screen.hint && <div className="hint-wrap"><button className="hint-button" onClick={() => setHintOpen(!hintOpen)} aria-expanded={hintOpen}>💡 ヒントを見る</button>{hintOpen && <div className="hint-box">{screen.hint}</div>}</div>}
           {screen.type !== "practiceVideo" && <div className="lesson-actions">
             <button className="secondary-button" onClick={back}>← 戻る</button>
@@ -231,7 +233,8 @@ function HomeScreen({ user, saved, legacySaved, totalProgress, startStep, markIn
       <div className="section-heading"><div><p className="eyebrow">BASIC COURSE</p><h2>基本編</h2><p>まずは「調べる・編集する」仕事の基本から。</p></div><span className="course-badge">STEP 1—5</span></div>
       <div className="step-grid">{STEPS.filter(s => s.id <= 5).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div>
     </section>
-    <section className="curriculum"><div className="section-heading"><div><p className="eyebrow">ADVANCED COURSE</p><h2>応用編</h2><p>ズームと音声編集を、自分のペースで練習しましょう。</p></div><span className="course-badge">STEP 6</span></div><div className="step-grid">{STEPS.filter(s => s.id === 6).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div></section>
+    <ZoomGuideCard />
+    <section className="curriculum" id="step6-course"><div className="section-heading"><div><p className="eyebrow">ADVANCED COURSE</p><h2>応用編</h2><p>ズームと音声編集を、自分のペースで練習しましょう。</p></div><span className="course-badge">STEP 6</span></div><div className="step-grid">{STEPS.filter(s => s.id === 6).map(s => <StepCard key={s.id} step={s} completed={completed.includes(s.id)} onStart={() => startStep(s.id)} onIncomplete={() => markIncomplete(s.id)} />)}</div></section>
     <footer><span className="brand-mark">S</span><p>少しずつ、確実に。<br /><small>進み具合はアカウントごとに自動で保存されます。</small></p></footer>
   </main>
 }
